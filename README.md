@@ -16,10 +16,10 @@ First Goal: Create a backbone for the project for which we can then customize
 
 *Elijah also mentioned something about a GUI before the minigame starts
 
-<b>START BACKEND:</b>\n
--cd backend\n
--npm run dev\n
+<b>START BACKEND:</b></br>
+-cd backend</br>
+-npm run dev</br>
 
-<b>START FRONTEND:</b>
--cd frontend
--npm start
+<b>START FRONTEND:</b></br>
+-cd frontend</br>
+-npm start</br>
