@@ -16,11 +16,11 @@ First Goal: Create a backbone for the project for which we can then customize
 
 *Elijah also mentioned something about a GUI before the minigame starts
 
-##Backend setup Commands
+## Backend setup Commands
 * cd backend
 * npm install mongoose
 
-##Frontend setup Commands
+## Frontend setup Commands
 * cd frontend
 * npm install react-router
 * npm install react-router-dom
