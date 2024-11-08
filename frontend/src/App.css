@@ -1,0 +1,68 @@
+/* Global Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f9;
+  }
+  
+  /* Header Styling */
+  header {
+    position: fixed;  /* Fixes the header to the top of the page */
+    top: 0;           /* Position it at the very top */
+    left: 0;          /* Align it to the left side of the page */
+    width: 100%;      /* Make the header span across the entire width of the page */
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    display: flex;    /* Use Flexbox to arrange content */
+    justify-content: space-between;  /* Space out the title and buttons */
+    align-items: center;  /* Vertically center content */
+    padding: 10px 20px;  /* Add padding for spacing */
+    z-index: 1000;     /* Ensure the header is above other content */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a shadow to the header */
+  }
+  
+  /* Push the rest of the content below the header */
+  .App {
+    margin-top: 80px;  /* Space to push content below the header */
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+  }
+  
+  /* Navigation Button Container */
+  nav {
+    display: flex; /* Align buttons horizontally */
+    margin-right: 40px;
+  }
+  
+  /* Styling for the buttons */
+  button {
+    background-color: white; /* Green background */
+    color: #4CAF50;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px;  /* Space between buttons */
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Button Hover Effect */
+  button:hover {
+    background-color: #45a049; /* Darker green when hovered */
+    color: white;
+  }
+  
+  /* Link Reset */
+  a {
+    text-decoration: none; /* Remove underline from links */
+  }
+  

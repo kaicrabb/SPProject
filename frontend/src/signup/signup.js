@@ -12,7 +12,7 @@ function SignUp() {
 
   return (
     <div>
-      <h2>Sign Up</h2>
+      <h2>Sign Up Here!</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="email"
