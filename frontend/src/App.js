@@ -27,7 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           {/* Add a fallback route for undefined routes */}
-          <Route path="*" element={<h2>Page Not Found</h2>} />
+          <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>
       </div>
     </Router>
