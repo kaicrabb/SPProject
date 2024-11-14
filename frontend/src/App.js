@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import SignUp from './signup/signup'; // Assuming you have a SignUp component
 import Login from './login/login'; // Assuming you have a Login component
 import './App.css'; // Import the CSS file for styling
+import DelAcc from './delete_account/delacc';
 
 function App() {
   // State to hold font family and gradient background
@@ -51,6 +52,9 @@ function App() {
             <Link to="/login">
               <button>Log In</button>
             </Link>
+            <Link to="/delacc">
+              <button>Delete Account</button>
+            </Link>
           </nav>
         </header>
 
@@ -58,6 +62,7 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/delacc" element={<DelAcc />} />
 
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />

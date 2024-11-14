@@ -32,6 +32,7 @@ function SignUp() {
 
       if (response.ok) {
         setSuccess('User signed up successfully!');
+        alert('Account Created!');
         setUsername('');
         setPassword('');
         navigate('/game');

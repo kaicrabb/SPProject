@@ -32,6 +32,7 @@ function Login() {
 
       if (response.ok) {
         setSuccess('Login successful!');
+        alert('Login Successful!');
         setUsername('');
         setPassword('');
         navigate('/dashboard');  // Redirect to the dashboard or another page after login
