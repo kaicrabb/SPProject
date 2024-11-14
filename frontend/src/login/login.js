@@ -31,6 +31,7 @@ function Login() {
       const result = await response.json();
 
       if (response.ok) {
+        localStorage.setItem('token', result.token);
         setSuccess('Login successful!');
         alert('Login Successful!');
         setUsername('');

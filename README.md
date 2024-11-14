@@ -21,16 +21,15 @@ First Goal: Create a backbone for the project for which we can then customize
 * npm install mongoose
 * npm install bcryptjs
 * npm install cors
+* npm install jsonwebtoken
+#### <b>START BACKEND:</b>
+1. cd backend
+2. npm run dev
 
 ## Frontend setup Commands
 * cd frontend
 * npm install react-router
 * npm install react-router-dom
-
-<b>START BACKEND:</b></br>
--cd backend</br>
--npm run dev</br>
-
-<b>START FRONTEND:</b></br>
--cd frontend</br>
--npm start</br>
+#### <b>START FRONTEND:</b>
+1. cd frontend
+2. npm start

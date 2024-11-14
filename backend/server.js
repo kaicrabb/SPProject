@@ -5,6 +5,13 @@ const mongoose = require("mongoose");
 const cors = require('cors'); // Importing cors module
 const app = express();
 const bodyParser = require("body-parser");
+const jwt = require('jsonwebtoken');
+
+// For the purposes of making this easier to use while developing and allowing
+// ease of use for grading in this class we are not hiding the SECRET_KEY.
+// In an actual situation we would want this completely hidden, probably in an
+// environment variable.
+const SECRET_KEY = '9995c54a0d9b41cd38286daaf84be08f9e1ff76e4d04ffb3e3470a19f11d4a592164c6ba28d06536a6814790eaa8eabd4ad34eb09469a80d10f9bb33160502ad'; 
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
@@ -101,8 +108,8 @@ app.post("/login", async (req, res) => {
         }
 
         // Successfully logged in
-        res.json({ message: "Login successful", user: { Username: user.Username } });
-
+        const token = jwt.sign({ username: user.Username }, SECRET_KEY, { expiresIn: '1h' });
+        res.json({ token });
     } catch (err) {
         console.error("Error during login:", err);
         res.status(500).json({ message: "Internal server error", error: err.message });
@@ -138,6 +145,40 @@ app.delete("/deleteAccount", async (req, res) => {
     }
 });
 
+const authenticateToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];  // Extract token from the Authorization header
+  
+    if (!token) {
+        return res.sendStatus(401);  // No token, unauthorized
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.sendStatus(403);  // Invalid token, forbidden
+        }
+        req.user = user;  // Store user info in the request object
+        next();  // Proceed to the next middleware or route handler
+    });
+};
+  
+// Profile route that requires authentication
+app.get('/profile', authenticateToken, async (req, res) => {
+    try {
+        const user = await Contact.findOne({ Username: req.user.username });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({
+            username: user.Username,
+            score: user.Score || "No score yet",  // Send "No score yet" if the score is null
+        });
+    } catch (err) {
+        console.error("Error fetching profile data:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 // Start the server
 app.listen(5000, () => { 
