@@ -4,6 +4,7 @@ import SignUp from './signup/signup'; // Assuming you have a SignUp component
 import Login from './login/login'; // Assuming you have a Login component
 import './App.css'; // Import the CSS file for styling
 import DelAcc from './delete_account/delacc';
+import Profile from './profile/profile';
 
 function App() {
   // State is still here if you decide to add functionality later
@@ -32,6 +33,9 @@ function App() {
             <Link to="/delacc">
               <button>Delete Account</button>
             </Link>
+            <Link to="/profile">
+              <button>Profile</button>
+            </Link>
           </nav>
         </header>
 
@@ -40,6 +44,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/delacc" element={<DelAcc />} />
+          <Route path="/profile" element={<Profile />} />
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>
