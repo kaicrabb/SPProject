@@ -41,16 +41,13 @@ const Contact = mongoose.model("Contact", contactSchema);
 
 // Route to handle user sign-up
 app.post("/contact", async (req, res) => { 
-    // Extract username and password from request body
     const { Username, Password } = req.body;
 
-    // Basic validation for input fields
     if (!Username || !Password) {
         return res.status(400).json({ message: "Username and password are required" });
     }
 
     try {
-        // Check if the username already exists in the database
         const existingContact = await Contact.findOne({ Username: Username });
         
         if (existingContact) {
@@ -60,27 +57,54 @@ app.post("/contact", async (req, res) => {
         // Hash the password asynchronously using bcrypt
         const hashedPassword = await bcrypt.hash(Password, 10);
 
-        // Create new Contact (user) with the hashed password
         const contact = new Contact({
             Username: Username,
             Password: hashedPassword,  // Save the hashed password, not the plain one
         });
 
-        // Save the new contact to the database
         await contact.save();
 
-        // Respond with a success message
         res.json({ message: 'User created successfully' });
 
     } catch (err) {
         console.error('Error saving contact:', err);
-
-        // Handle potential duplicate key error for unique constraint
+        
         if (err.code === 11000) {
             return res.status(400).json({ message: "Username already exists" });
         }
 
-        // Generic error response
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+});
+
+// Add the Login route
+app.post("/login", async (req, res) => {
+    const { Username, Password } = req.body;
+
+    if (!Username || !Password) {
+        return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    try {
+        // Find the user by username
+        const user = await Contact.findOne({ Username: Username });
+
+        if (!user) {
+            return res.status(401).json({ message: "Invalid username or password" });
+        }
+
+        // Compare the provided password with the stored hashed password
+        const isMatch = await bcrypt.compare(Password, user.Password);
+
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid username or password" });
+        }
+
+        // Successfully logged in
+        res.json({ message: "Login successful", user: { Username: user.Username } });
+
+    } catch (err) {
+        console.error("Error during login:", err);
         res.status(500).json({ message: "Internal server error", error: err.message });
     }
 });

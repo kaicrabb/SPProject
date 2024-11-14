@@ -1,11 +1,14 @@
 // src/signup/signup.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');  // For handling errors
   const [success, setSuccess] = useState('');  // For showing success messages
+
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -31,6 +34,8 @@ function SignUp() {
         setSuccess('User signed up successfully!');
         setUsername('');
         setPassword('');
+        navigate('/game');
+        
       } else {
         setError(result.message || 'Something went wrong');
       }
