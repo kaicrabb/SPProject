@@ -65,4 +65,32 @@ body {
   a {
     text-decoration: none; /* Remove underline from links */
   }
+
+  .top-centered-container {
+    display: flex;
+    align-items: flex-start; /* Aligns the content to the top */
+    justify-content: center; /* Centers content horizontally */
+    padding-top: 20px; /* Adds padding at the top */
+    font-size: 2rem; /* Adjust font size as needed */
+    color: transparent; /* Make the text itself transparent to show the gradient */
+    -webkit-background-clip: text; /* Clips the background to text */
+    background-clip: text; /* Ensures the gradient is applied to the text */
+    height: 100vh; /* Full viewport height */
+    box-sizing: border-box; /* Ensures padding doesn't affect container width */
+    
+    /* Opacity animation */
+    animation: fadeIn 3s ease-in-out; /* Apply the fade-in animation over 3 seconds */
+  }
+  
+  /* Keyframes for fade-in effect */
+  @keyframes fadeIn {
+    0% {
+      opacity: 0; /* Start with opacity 0 */
+    }
+    100% {
+      opacity: 1; /* End with opacity 1 */
+    }
+  }
+  
+   
   
