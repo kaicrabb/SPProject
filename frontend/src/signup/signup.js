@@ -2,23 +2,52 @@
 import React, { useState } from 'react';
 
 function SignUp() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');  // For handling errors
+  const [success, setSuccess] = useState('');  // For showing success messages
 
-  const handleSubmit = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    console.log('Signing up with:', email, password);
+
+    if (!username || !password) {
+      setError('Username and password are required');
+      return;
+    }
+
+    try {
+      // Send POST request to backend API (Express)
+      const response = await fetch('http://localhost:5000/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Username: username, Password: password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSuccess('User signed up successfully!');
+        setUsername('');
+        setPassword('');
+      } else {
+        setError(result.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('An error occurred while signing up.');
+    }
   };
 
   return (
     <div>
       <h2>Sign Up Here!</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSignup}>
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="password"
@@ -28,6 +57,9 @@ function SignUp() {
         />
         <button type="submit">Sign Up</button>
       </form>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
     </div>
   );
 }
