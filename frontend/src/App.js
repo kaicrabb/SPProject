@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import SignUp from './signup/signup'; // Assuming you have a SignUp component
 import Login from './login/login'; // Assuming you have a Login component
@@ -6,42 +6,19 @@ import './App.css'; // Import the CSS file for styling
 import DelAcc from './delete_account/delacc';
 
 function App() {
-  // State to hold font family and gradient background
+  // State is still here if you decide to add functionality later
   const [fontFamily, setFontFamily] = useState('');
-  const [gradient, setGradient] = useState('');
 
   useEffect(() => {
-    document.title = 'Little Guy';
-
-    // Array of font families
-    const fonts = [
-      'Courier New', 
-      'Lucida Console', 
-      'Monaco', 
-      'Consolas', 
-      'Menlo'
-    ];
-
-    // Array of gradient color combinations
-    const gradients = [
-      'linear-gradient(to right, limegreen, pink)',
-      'linear-gradient(to right, indigo, limegreen)',
-      'linear-gradient(to right, orange, limegreen)',
-      'linear-gradient(to right, maroon, limegreen)',
-      'linear-gradient(to right, purple, limegreen)',
-    ];
-
-    // Randomly select a font and gradient
-    const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
-    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-
-    setFontFamily(randomFont);
-    setGradient(randomGradient);
-  }, []);
+    document.title = 'Little Guy'; // You can keep this if you want to update the title dynamically later
+  }, []); // Empty dependency array ensures this effect runs once on mount
 
   return (
     <Router>
-      <div className="App" style={{ fontFamily, background: gradient, paddingTop: '20px' }}>
+      <div className="App" style={{ fontFamily, paddingTop: '20px' }}>
+        {/* Image at the top with fade-in effect */}
+        <img src="https://i.ibb.co/Tt6zjVC/ascii-text-art-donefs.png" alt="Title" className="header-image" />
+
         {/* Header Section */}
         <header>
           <h1>Little Guy</h1>
@@ -58,12 +35,11 @@ function App() {
           </nav>
         </header>
 
-        {/* Routes for Signup and Login Pages */}
+        {/* Routes for Signup, Login, and Delete Account Pages */}
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/delacc" element={<DelAcc />} />
-
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>
