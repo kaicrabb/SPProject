@@ -22,7 +22,6 @@ function App() {
 
         {/* Header Section */}
         <header>
-          <h1>Little Guy</h1>
           <nav>
             <Link to="/signup">
               <button>Sign Up</button>

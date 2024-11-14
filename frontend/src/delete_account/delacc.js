@@ -1,6 +1,4 @@
-// src/delacc/DelAcc.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function DelAcc() {
@@ -45,7 +43,6 @@ function DelAcc() {
         setPassword('');
         setConPassword('');
         navigate('/signup');  // Redirect after deletion
-
       } else {
         setError(result.message || 'Failed to delete account');
       }
@@ -53,6 +50,30 @@ function DelAcc() {
       setError('An error occurred while deleting the account.');
     }
   };
+
+  useEffect(() => {
+    // Step 1: Dynamically inject Google Font into the document
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Silkscreen&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    // Step 2: Apply the font family to the input placeholders
+    const style = document.createElement('style');
+    style.innerHTML = `
+      input::placeholder {
+        font-family: 'Silkscreen', cursive !important;
+        color: #888;  /* Optional: Adjust placeholder color */
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Cleanup: Remove the injected elements when the component unmounts
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(style);
+    };
+  }, []); // Empty dependency array to run only once
 
   return (
     <div>
@@ -63,18 +84,30 @@ function DelAcc() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          style={{
+            color: 'black',  // Set input text color
+            fontFamily: 'Silkscreen',  // Set font family for input text
+          }}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          style={{
+            color: 'black',  // Set input text color
+            fontFamily: 'Silkscreen',  // Set font family for input text
+          }}
         />
         <input
           type="password"
           placeholder="Confirm Password"
           value={conPassword}
           onChange={(e) => setConPassword(e.target.value)}
+          style={{
+            color: 'black',  // Set input text color
+            fontFamily: 'Silkscreen',  // Set font family for input text
+          }}
         />
         <button type="submit">Delete Account</button>
       </form>

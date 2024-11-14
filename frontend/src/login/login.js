@@ -1,14 +1,34 @@
-// src/login/Login.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');  // For handling errors
-  const [success, setSuccess] = useState('');  // For showing success messages
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    // Step 1: Dynamically inject the Google Font into the document
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Silkscreen&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    // Step 2: Apply the font family to the input placeholders
+    const style = document.createElement('style');
+    style.innerHTML = `
+      input::placeholder {
+        font-family: 'Silkscreen', cursive !important;
+        color: #888;  /* Optional: Adjust placeholder color */
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Cleanup: Remove the injected elements when the component unmounts
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(style);
+    };
+  }, []); // Empty dependency array to run only once
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,7 +39,6 @@ function Login() {
     }
 
     try {
-      // Send POST request to backend API (Express)
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: {
@@ -36,7 +55,6 @@ function Login() {
         alert('Login Successful!');
         setUsername('');
         setPassword('');
-        navigate('/game');  // Redirect to the dashboard or another page after login
       } else {
         setError(result.message || 'Invalid username or password');
       }
@@ -54,12 +72,20 @@ function Login() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          style={{
+            color: 'black',   // Change the input text color
+            fontFamily: 'Silkscreen',  // Set font family for the text inside the input
+          }}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          style={{
+            color: 'black',   // Change the input text color
+            fontFamily: 'Arial, sans-serif',  // Set font family for the text inside the input
+          }}
         />
         <button type="submit">Login</button>
       </form>
