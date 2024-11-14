@@ -41,6 +41,13 @@ const contactSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
+    DateCreated: { 
+        type: Date, default: Date.now, 
+        required: true 
+    },
+    Score: {
+        type: Number
+    },
 });
 
 // Create the Contact model
