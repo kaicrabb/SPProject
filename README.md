@@ -19,6 +19,8 @@ First Goal: Create a backbone for the project for which we can then customize
 ## Backend setup Commands
 * cd backend
 * npm install mongoose
+* npm install bcryptjs
+* npm install cors
 
 ## Frontend setup Commands
 * cd frontend
