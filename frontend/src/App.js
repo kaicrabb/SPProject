@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import SignUp from './signup/signup'; // Assuming you have a SignUp component
 import Login from './login/login'; // Assuming you have a Login component
 import './App.css'; // Import the CSS file for styling
+import DelAcc from './delete_account/delacc';
 
 function App() {
   // State is still here if you decide to add functionality later
@@ -14,28 +15,32 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
-        {/* Black Header with no text */}
-        <header className="header" />
-
+      <div className="App" style={{ fontFamily, paddingTop: '20px' }}>
         {/* Image at the top with fade-in effect */}
-        <img src="https://i.ibb.co/Tt6zjVC/ascii-text-art-donefs.png" alt="Title" />
+        <img src="https://i.ibb.co/Tt6zjVC/ascii-text-art-donefs.png" alt="Title" className="header-image" />
 
-        {/* Centered Navigation */}
-        <nav>
-          <Link to="/signup">
-            <button>Sign Up</button>
-          </Link>
-          <Link to="/login">
-            <button>Log In</button>
-          </Link>
-        </nav>
-    
-        {/* Routes for Signup and Login Pages */}
+        {/* Header Section */}
+        <header>
+          <h1>Little Guy</h1>
+          <nav>
+            <Link to="/signup">
+              <button>Sign Up</button>
+            </Link>
+            <Link to="/login">
+              <button>Log In</button>
+            </Link>
+            <Link to="/delacc">
+              <button>Delete Account</button>
+            </Link>
+          </nav>
+        </header>
+
+        {/* Routes for Signup, Login, and Delete Account Pages */}
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-    
+          <Route path="/delacc" element={<DelAcc />} />
+          
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>

@@ -109,6 +109,36 @@ app.post("/login", async (req, res) => {
     }
 });
 
+app.delete("/deleteAccount", async (req, res) => {
+    const { Username, Password } = req.body;
+
+    if (!Username || !Password) {
+        return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    try {
+        const user = await Contact.findOne({ Username: Username });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isMatch = await bcrypt.compare(Password, user.Password);
+
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+        await Contact.deleteOne({ Username: Username });
+
+        res.json({ message: "Account deleted successfully" });
+    } catch (err) {
+        console.error("Error during account deletion:", err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+});
+
+
 // Start the server
 app.listen(5000, () => { 
     console.log("Server started on port 5000");
