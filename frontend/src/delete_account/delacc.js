@@ -44,7 +44,7 @@ function DelAcc() {
         setUsername('');
         setPassword('');
         setConPassword('');
-        navigate('/');  // Redirect after deletion
+        navigate('/signup');  // Redirect after deletion
       } else {
         setError(result.message || 'Failed to delete account');
       }
