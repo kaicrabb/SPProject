@@ -7,6 +7,17 @@ function Profile() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Silkscreen&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);  
+
+  useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         // Send GET request to backend API to retrieve user information
@@ -40,17 +51,17 @@ function Profile() {
 
   return (
     <div>
-      <h2>User Profile</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <h2 style={{ fontFamily: 'Silkscreen', textAlign: 'center', color: 'white' }}>User Profile</h2>
+      {error && <p style={{ color: 'white', fontFamily: 'Silkscreen' }}>{error}</p>}
       {userInfo ? (
-        <div>
+        <div style={{ fontFamily: 'Silkscreen', color: 'white' }}>
           <p><strong>Username:</strong> {userInfo.username}</p>
-          <p><strong>HighScore: </strong> {userInfo.Score}</p>
+          <p><strong>HighScore:</strong> {userInfo.Score}</p>
           <p><strong>Joined:</strong> {new Date(userInfo.joinedDate).toLocaleDateString()}</p>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} style={{ fontFamily: 'Silkscreen', color: 'black' }}>Logout</button>
         </div>
       ) : (
-        <p>Loading user information...</p>
+        <p style={{ fontFamily: 'Silkscreen', color: 'white' }}>Loading user information...</p>
       )}
     </div>
   );
