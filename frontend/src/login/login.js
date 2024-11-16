@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Step 1: Dynamically inject the Google Font into the document
@@ -55,6 +58,7 @@ function Login() {
         alert('Login Successful!');
         setUsername('');
         setPassword('');
+        navigate('/game');
       } else {
         setError(result.message || 'Invalid username or password');
       }

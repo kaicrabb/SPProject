@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+body{
+    font-family:'Silkscreen';
+    text-align: center;
+}
+
+#board {
+    background: url('./img/background.png') no-repeat center center fixed;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    border-bottom: 1px solid black;
+}
