@@ -5,6 +5,7 @@ import Login from './login/login'; // Assuming you have a Login component
 import './App.css'; // Import the CSS file for styling
 import DelAcc from './delete_account/delacc';
 import Profile from './profile/profile';
+import Game from './game/game';
 
 function App() {
   // State is still here if you decide to add functionality later
@@ -49,6 +50,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/delacc" element={<DelAcc />} />
           <Route path="/profile" element={<Profile selectedImage={selectedImage} setSelectedImage={setSelectedImage}/>}/>
+          <Route path="/game" element={<Game/>}/>
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>
