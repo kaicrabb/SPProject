@@ -79,7 +79,9 @@ app.post("/contact", async (req, res) => {
 
         await contact.save();
 
-        res.json({ message: 'User created successfully' });
+        const token = jwt.sign({ username: contact.Username }, SECRET_KEY, { expiresIn: '1h' });
+
+        res.json({ message: 'User created successfully', token });
 
     } catch (err) {
         console.error('Error saving contact:', err);

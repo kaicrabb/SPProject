@@ -58,7 +58,23 @@ function SignUp() {
         alert('Account Created!');
         setUsername('');
         setPassword('');
-        navigate('/game');
+        
+        const loginResponse = await fetch('http://localhost:5000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ Username: username, Password: password }),
+        });
+        const loginResult = await loginResponse.json();
+
+        if (loginResponse.ok) {
+          // Store the token in local storage
+          localStorage.setItem('token', loginResult.token);
+          navigate('/game'); // Navigate to game screen
+        } else {
+          setError(loginResult.message || 'Login failed after sign-up');
+        }
       } else {
         setError(result.message || 'Something went wrong');
       }
