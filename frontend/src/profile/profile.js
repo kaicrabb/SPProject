@@ -58,6 +58,8 @@ function Profile({ selectedImage, setSelectedImage }) {
 
   const handleLogout = () => {
     localStorage.removeItem('token');  // Clear token on logout
+    localStorage.removeItem('profileImage');  // Clear the selected profile image from localStorage
+    setSelectedImage('/profileicons/profiledefault.png') // Set profile image back to default
     navigate('/dashboard');  // Redirect to dashboard page
   };
 
