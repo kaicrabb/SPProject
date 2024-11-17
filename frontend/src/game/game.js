@@ -87,6 +87,7 @@ function Game() {
         requestAnimationFrame(update); // Keeps the game loop running
 
         if (gameOver) {
+            sendScore(score);
             return;
         }
 
@@ -127,7 +128,7 @@ function Game() {
             return;
         }
 
-        if ((e.code == "Space" || e.code == "ArrowUp") && cyborg.y == cyborgY) {
+        if ((e.code === "Space" || e.code === "ArrowUp") && cyborg.y === cyborgY) {
             // Jump when spacebar or up arrow is pressed
             velocityY = -10;
         }
@@ -176,6 +177,36 @@ function Game() {
                a.x + a.width > b.x &&
                a.y < b.y + b.height &&
                a.y + a.height > b.y;
+    }
+}
+
+async function sendScore(score) {
+    const token = localStorage.getItem('token');  // Get the token from localStorage
+
+    if (!token) {
+        console.error("No token found");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:5000/Contact', {  // Correct endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',  // Set content type to JSON
+                'Authorization': `Bearer ${token}`   // Add the token in the Authorization header
+            },
+            body: JSON.stringify({ score: score })  // Send score in the request body
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to update score');
+        }
+
+        console.log('Score updated:', data);
+    } catch (error) {
+        console.error('Failed to update score:', error.message);
     }
 }
 

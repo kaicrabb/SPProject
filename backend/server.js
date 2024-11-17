@@ -191,6 +191,37 @@ app.get('/profile', authenticateToken, async (req, res) => {
     }
 });
 
+app.post('/updateScore', authenticateToken, async (req, res) => {
+    const { score } = req.body;
+    const { userId } = req.user;  // Get userId from the token
+
+    if (!score) {
+        return res.status(400).json({ message: 'Score is required' });
+    }
+
+    try {
+        console.log('Looking for user with userId:', userId);  // Log userId for debugging
+        const user = await Contact.findById(userId);  // Use userId to find the user by _id
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if the new score is higher than the existing score
+        if (score > user.Score) {
+            user.Score = score;
+            await user.save();
+            return res.json({ message: 'Score updated successfully!' });
+        }
+
+        res.json({ message: 'Score is not higher than the current score.' });
+    } catch (err) {
+        console.error('Error updating score:', err);
+        res.status(500).json({ message: 'Internal server error', error: err.message });
+    }
+});
+
+
 // Start the server
 app.listen(5000, () => { 
     console.log("Server started on port 5000");
