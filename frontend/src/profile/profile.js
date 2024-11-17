@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Profile() {
+function Profile({ selectedImage, setSelectedImage }) {
   const [userInfo, setUserInfo] = useState(null);  // Store user information
   const [error, setError] = useState('');  // For handling errors
   const navigate = useNavigate();
+
+  const profileImages = [
+    '/profileicons/profiledefault.png',
+    '/profileicons/profilecreeps.png',
+    '/profileicons/profileflat.png',
+    '/profileicons/profileflat2.png',
+    '/profileicons/profileoh.png',
+    '/profileicons/profileshades.png',
+    '/profileicons/profilesmiley.png',
+    '/profileicons/profilesurprise.png',
+  ];
+
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -49,16 +61,45 @@ function Profile() {
     navigate('/dashboard');  // Redirect to dashboard page
   };
 
+  const handleImageChange = (e) => {
+    const selected = e.target.value;
+    setSelectedImage(selected); // Update the App-level state instantly
+    localStorage.setItem('profileImage', selected); // Save to localStorage
+  };
+  
+
   return (
     <div>
       <h2 style={{ fontFamily: 'Silkscreen', textAlign: 'center', color: 'white' }}>User Profile</h2>
       {error && <p style={{ color: 'white', fontFamily: 'Silkscreen' }}>{error}</p>}
       {userInfo ? (
         <div style={{ fontFamily: 'Silkscreen', color: 'white' }}>
+
           <p><strong>Username:</strong> {userInfo.username}</p>
-          <p><strong>HighScore:</strong> {userInfo.Score}</p>
-          <p><strong>Joined:</strong> {new Date(userInfo.joinedDate).toLocaleDateString()}</p>
-          <button onClick={handleLogout} style={{ fontFamily: 'Silkscreen', color: 'black' }}>Logout</button>
+          <p><strong>HighScore:</strong> {userInfo.score}</p>
+          <p><strong>Joined:</strong> {userInfo.joined}</p>
+
+          <div>
+            <label htmlFor="profile-image" style={{ display: 'block', margin: '10px 0' }}>
+              Select Profile Image:
+            </label>
+            <select id="profileImage" value={selectedImage} onChange={handleImageChange}>
+              {profileImages.map((image, index) => {const imageName = image
+                .split('/')
+                .pop()
+                .replace('profile', '')
+                .replace('.png', '');
+                return (<option key={index} value={image}>
+                  {imageName.charAt(0).toUpperCase() + imageName.slice(1)}
+                  </option>
+                );
+              })}
+            </select>
+
+          </div>
+          <button onClick={handleLogout} style={{ fontFamily: 'Silkscreen', color: 'black' }}>
+            Logout
+          </button>
         </div>
       ) : (
         <p style={{ fontFamily: 'Silkscreen', color: 'white' }}>Loading user information...</p>
@@ -66,5 +107,6 @@ function Profile() {
     </div>
   );
 }
+
 
 export default Profile;

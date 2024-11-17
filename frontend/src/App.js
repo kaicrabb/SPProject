@@ -9,6 +9,10 @@ import Profile from './profile/profile';
 function App() {
   // State is still here if you decide to add functionality later
   const [fontFamily, setFontFamily] = useState('');
+  const [selectedImage, setSelectedImage] = useState(
+    localStorage.getItem('profileImage') || '/profileicons/profiledefault.png'
+  );
+  
 
   useEffect(() => {
     document.title = 'Little Guy'; // You can keep this if you want to update the title dynamically later
@@ -33,7 +37,8 @@ function App() {
               <button>Delete Account</button>
             </Link>
             <Link to="/profile">
-              <button>Profile</button>
+              <img src={selectedImage} alt="Profile" style={{width: '50px',
+                height: '50px', cursor: 'pointer',}}/>
             </Link>
           </nav>
         </header>
@@ -43,7 +48,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/delacc" element={<DelAcc />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile selectedImage={selectedImage} setSelectedImage={setSelectedImage}/>}/>
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>

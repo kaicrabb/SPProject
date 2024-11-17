@@ -6,6 +6,7 @@ const cors = require('cors'); // Importing cors module
 const app = express();
 const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
+const dayjs = require('dayjs');
 
 // For the purposes of making this easier to use while developing and allowing
 // ease of use for grading in this class we are not hiding the SECRET_KEY.
@@ -42,7 +43,7 @@ const contactSchema = new mongoose.Schema({
         required: true 
     },
     DateCreated: { 
-        type: Date, default: Date.now, 
+        type: String, default: () => dayjs().format('YYYY-MM-DD'), 
         required: true 
     },
     Score: {
@@ -180,6 +181,7 @@ app.get('/profile', authenticateToken, async (req, res) => {
         res.json({
             username: user.Username,
             score: user.Score || "No score yet",  // Send "No score yet" if the score is null
+            joined: user.DateCreated,
         });
     } catch (err) {
         console.error("Error fetching profile data:", err);

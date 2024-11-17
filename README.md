@@ -22,6 +22,7 @@ First Goal: Create a backbone for the project for which we can then customize
 * npm install bcryptjs
 * npm install cors
 * npm install jsonwebtoken
+* npm install dayjs
 #### <b>START BACKEND:</b>
 1. cd backend
 2. npm run dev
