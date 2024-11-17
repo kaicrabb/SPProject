@@ -1,8 +1,8 @@
 // Import images at the top
 import cyborgImgSrc from './img/cyborg.png';
-import box1ImgSrc from './img/cactus1.png';
-import box2ImgSrc from './img/cactus2.png';
-import box3ImgSrc from './img/cactus3.png';
+import box1ImgSrc from './img/Crate1.png';
+import box2ImgSrc from './img/Crate2.png';
+import box3ImgSrc from './img/Crate3.png';
 import cyborgDeadImgSrc from './img/cyborg-dead.png';
 import backgroundImgSrc from './img/background.png';
 
