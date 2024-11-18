@@ -7,6 +7,10 @@ import cyborgDeadImgSrc from './img/cyborg-dead.png';
 import backgroundImgSrc from './img/background.png';
 
 function Game() { 
+    //get users token from logging in
+    let token = localStorage.getItem('token');
+    console.log(token);
+
     // Declare board and other game variables
     let board;
     let boardWidth = 750;
@@ -62,6 +66,7 @@ function Game() {
 
     let gameOver = false;
     let score = 0;
+    let scoreSent = false;
 
     // Setup the game when the page loads
     window.onload = function() {
@@ -87,7 +92,10 @@ function Game() {
         requestAnimationFrame(update); // Keeps the game loop running
 
         if (gameOver) {
-            sendScore(score);
+            if (!scoreSent) {
+                sendScore(token, score); // Send the score to the server if not already sent
+                scoreSent = true;
+            }
             return;
         }
 
@@ -114,7 +122,6 @@ function Game() {
                 };
             }
         }
-
         // Render the score
         context.fillStyle = "white";
         context.font = "20px Silkscreen";
@@ -169,6 +176,8 @@ function Game() {
         if (boxArray.length > 5) {
             boxArray.shift(); // Remove the oldest box
         }
+
+        
     }
 
     // Collision detection function
@@ -178,35 +187,30 @@ function Game() {
                a.y < b.y + b.height &&
                a.y + a.height > b.y;
     }
-}
-
-async function sendScore(score) {
-    const token = localStorage.getItem('token');  // Get the token from localStorage
-
-    if (!token) {
-        console.error("No token found");
-        return;
-    }
-
-    try {
-        const response = await fetch('http://localhost:5000/Contact', {  // Correct endpoint
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',  // Set content type to JSON
-                'Authorization': `Bearer ${token}`   // Add the token in the Authorization header
-            },
-            body: JSON.stringify({ score: score })  // Send score in the request body
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Failed to update score');
+    
+    async function sendScore(token, score) {
+        console.log("sending score");
+        try {
+            const response = await fetch('http://localhost:3000/submit-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Send the token in the Authorization header
+                },
+                body: JSON.stringify({ score }), // Send score in the request body
+                
+            });
+            console.log("score sent");
+            if (response.ok) {
+                const data = await response.json(); // Wait for the response and parse it
+                console.log(data.message); // Handle success message from the server
+                console.log("Response given");
+            } else {
+                throw new Error('Failed to submit score.'); // Throw error if response is not ok
+            }
+        } catch (error) {
+            console.error('Error:', error); // Handle any error that occurred during fetch
         }
-
-        console.log('Score updated:', data);
-    } catch (error) {
-        console.error('Failed to update score:', error.message);
     }
 }
 
