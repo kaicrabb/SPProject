@@ -10,7 +10,7 @@ function CharacterSelect({ setSelectedImage }) {
     const CharacterImages = [
         { name: 'Tiny', src: '/charactericons/tiny.png' },
         // Add more character sprites here, make sure png name is all lowercase, and name matches png name
-        // Dead sprites should be named "name"-dead.png check tiny for example
+        // Dead sprites should be named "name"-dead.png check tiny in public/charactericons for example
     ];
 
     useEffect(() => {
