@@ -50,7 +50,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/delacc" element={<DelAcc />} />
           <Route path="/profile" element={<Profile selectedImage={selectedImage} setSelectedImage={setSelectedImage}/>}/>
-          <Route path="/game" element={<Game/>}/>
+          <Route path="/game" element={<Game />} />
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>

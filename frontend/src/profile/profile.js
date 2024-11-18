@@ -55,6 +55,10 @@ function Profile({ selectedImage, setSelectedImage }) {
 
     fetchUserInfo();
   }, [navigate]);
+  
+  const handlegame = () => {
+    navigate('/game')
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('token');  // Clear token on logout
@@ -97,10 +101,12 @@ function Profile({ selectedImage, setSelectedImage }) {
                 );
               })}
             </select>
-
           </div>
           <button onClick={handleLogout} style={{ fontFamily: 'Silkscreen', color: 'black' }}>
             Logout
+          </button>
+          <button onClick={handlegame} style={{ fontFamily: 'Silkscreen', color: 'black' }}>
+            Back to game
           </button>
         </div>
       ) : (

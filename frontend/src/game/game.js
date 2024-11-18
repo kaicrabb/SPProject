@@ -1,4 +1,4 @@
-// Import images at the top
+import React, { useEffect } from 'react'; // Import React and useEffect
 import cyborgImgSrc from './img/cyborg.png';
 import box1ImgSrc from './img/Crate1.png';
 import box2ImgSrc from './img/Crate2.png';
@@ -7,17 +7,14 @@ import cyborgDeadImgSrc from './img/cyborg-dead.png';
 import backgroundImgSrc from './img/background.png';
 
 function Game() { 
-    //get users token from logging in
     let token = localStorage.getItem('token');
     console.log(token);
 
-    // Declare board and other game variables
     let board;
     let boardWidth = 750;
     let boardHeight = 250;
     let context;
 
-    // cyborg variables
     let cyborgWidth = 88;
     let cyborgHeight = 94;
     let cyborgX = 50;
@@ -30,7 +27,6 @@ function Game() {
         height: cyborgHeight
     };
 
-    // Box setup
     let boxArray = [];
 
     let box1Width = 34;
@@ -40,7 +36,6 @@ function Game() {
     let boxX = 700;
     let boxY = boardHeight - boxHeight;
 
-    // Load the cyborg and box images as Image objects
     let cyborgImg = new Image();
     cyborgImg.src = cyborgImgSrc;
 
@@ -59,7 +54,6 @@ function Game() {
     let backgroundImg = new Image();
     backgroundImg.src = backgroundImgSrc;
 
-    // Physics
     let velocityX = -8;
     let velocityY = 0;
     let gravity = 0.4;
@@ -68,80 +62,74 @@ function Game() {
     let score = 0;
     let scoreSent = false;
 
-    // Setup the game when the page loads
-    window.onload = function() {
-        // Set up the canvas board
+    useEffect(() => {
+        // Ensure the component has mounted before accessing DOM elements
+        const resetButton = document.getElementById("resetButton");
+        if (resetButton) {
+            resetButton.addEventListener("click", resetGame); // Add the event listener after component mount
+        }
+
+        // Set up the canvas board and game logic after the page has loaded
         board = document.getElementById("board");
         board.height = boardHeight;
         board.width = boardWidth;
-
-        // Set the background image through JS
         board.style.background = `url(${backgroundImgSrc}) no-repeat center center fixed`;
         board.style.backgroundSize = 'cover';
-
+    
         context = board.getContext("2d");
-
-        // Start the game loop
+    
         requestAnimationFrame(update);
         setInterval(placeBox, 1000); // Spawn a box every second
         document.addEventListener("keydown", moveCyborg); // Add controls
-    };
+    }, []); // Empty dependency array to ensure this effect runs once after component mounts
 
-    // Game update loop
     function update() {
-        requestAnimationFrame(update); // Keeps the game loop running
+        requestAnimationFrame(update);
 
         if (gameOver) {
             if (!scoreSent) {
-                sendScore(token, score); // Send the score to the server if not already sent
+                sendScore(token, score);
                 scoreSent = true;
             }
             return;
         }
 
-        // Clear the canvas for the next frame
         context.clearRect(0, 0, board.width, board.height);
 
-        // Apply gravity to cyborg
         velocityY += gravity;
-        cyborg.y = Math.min(cyborg.y + velocityY, cyborgY); // Apply gravity and prevent falling below ground
+        cyborg.y = Math.min(cyborg.y + velocityY, cyborgY);
         context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
 
-        // Move and render boxes
         for (let i = 0; i < boxArray.length; i++) {
             let box = boxArray[i];
-            box.x += velocityX; // Move box
+            box.x += velocityX;
             context.drawImage(box.img, box.x, box.y, box.width, box.height);
 
-            // Check for collisions
             if (detectCollision(cyborg, box)) {
                 gameOver = true;
-                cyborgImg.src = cyborgDeadImgSrc; // Change image when game is over
+                cyborgImg.src = cyborgDeadImgSrc;
                 cyborgImg.onload = function() {
                     context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
                 };
             }
         }
-        // Render the score
+
         context.fillStyle = "white";
         context.font = "20px Silkscreen";
         score++;
         context.fillText(score, 5, 20);
     }
 
-    // Move cyborg (jump when space or up arrow is pressed)
     function moveCyborg(e) {
         if (gameOver) {
             return;
         }
 
         if ((e.code === "Space" || e.code === "ArrowUp") && cyborg.y === cyborgY) {
-            // Jump when spacebar or up arrow is pressed
             velocityY = -10;
         }
     }
 
-    // Spawn new box
     function placeBox() {
         if (gameOver) {
             return;
@@ -155,8 +143,7 @@ function Game() {
             height: boxHeight
         };
 
-        // Randomly choose a box type
-        let placeBoxChance = Math.random(); // Generates a number between 0 and 1
+        let placeBoxChance = Math.random();
 
         if (placeBoxChance > 0.9) {
             box.img = box3Img;
@@ -172,46 +159,91 @@ function Game() {
             boxArray.push(box);
         }
 
-        // Limit the number of boxes in the array
         if (boxArray.length > 5) {
-            boxArray.shift(); // Remove the oldest box
+            boxArray.shift();
         }
-
-        
     }
 
-    // Collision detection function
     function detectCollision(a, b) {
         return a.x < b.x + b.width &&
                a.x + a.width > b.x &&
                a.y < b.y + b.height &&
                a.y + a.height > b.y;
     }
-    
+
     async function sendScore(token, score) {
-        console.log("sending score");
         try {
             const response = await fetch('http://localhost:3000/submit-score', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Send the token in the Authorization header
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ score }), // Send score in the request body
-                
+                body: JSON.stringify({ score }),
             });
-            console.log("score sent");
             if (response.ok) {
-                const data = await response.json(); // Wait for the response and parse it
-                console.log(data.message); // Handle success message from the server
-                console.log("Response given");
+                const data = await response.json();
+                console.log(data.message);
             } else {
-                throw new Error('Failed to submit score.'); // Throw error if response is not ok
+                throw new Error('Failed to submit score.');
             }
         } catch (error) {
-            console.error('Error:', error); // Handle any error that occurred during fetch
+            console.error('Error:', error);
         }
     }
-}
+
+    function resetGame() {
+        gameOver = false;
+        score = 0;
+        scoreSent = false;
+        velocityY = 0;
+        velocityX = -8;
+        cyborg.y = cyborgY;
+        cyborgImg.src = cyborgImgSrc;
+        boxArray = [];
+
+        context.clearRect(0, 0, board.width, board.height);
+        context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
+    }
+
+    return (
+        <div style={styles.gameWrapper}>
+            <div style={styles.canvasWrapper}>
+                <canvas id="board" style={styles.canvas}></canvas>
+                <img
+                    src="Reset.png"
+                    alt="Reset"
+                    style={styles.resetButton}
+                    id="resetButton" // Add id to the button element
+                />
+            </div>
+        </div>
+    );
+    
+};
+const styles = {
+    gameWrapper: {
+        display: 'flex',
+        justifyContent: 'center',  // Horizontally center the wrapper
+        alignItems: 'center',      // Vertically center the wrapper
+        height: '100vh',           // Full viewport height
+        backgroundColor: 'black', // Background color for the game screen
+    },
+    canvasWrapper: {
+        position: 'relative',  // Allows positioning of the button inside the canvas container
+    },
+    canvas: {
+        display: 'block',      // Removes unwanted space below the canvas
+        border: '2px solid black',  // Optional: Adds a border to the canvas for visibility
+    },
+    resetButton: {
+        position: 'absolute',   // Position relative to the canvas container
+        bottom: '300px',            // Adjust top margin
+        right: '0px',          // Adjust right margin
+        width: '32px',          // Set width for the button
+        height: '32px',         // Set height for the button
+        cursor: 'pointer',     // Changes cursor to pointer to indicate it's clickable
+    }
+};
 
 export default Game;
