@@ -6,6 +6,7 @@ import './App.css'; // Import the CSS file for styling
 import DelAcc from './delete_account/delacc';
 import Profile from './profile/profile';
 import Game from './game/game';
+import CharacterSelect from './character_select/character_select';
 
 function App() {
   // State is still here if you decide to add functionality later
@@ -13,7 +14,7 @@ function App() {
   const [selectedImage, setSelectedImage] = useState(
     localStorage.getItem('profileImage') || '/profileicons/profiledefault.png'
   );
-  
+  const [characterImage, setCharacterImage] = useState(null);  
 
   useEffect(() => {
     document.title = 'Little Guy'; // You can keep this if you want to update the title dynamically later
@@ -51,6 +52,8 @@ function App() {
           <Route path="/delacc" element={<DelAcc />} />
           <Route path="/profile" element={<Profile selectedImage={selectedImage} setSelectedImage={setSelectedImage}/>}/>
           <Route path="/game" element={<Game />} />
+          <Route path="/CharacterSelect" element={<CharacterSelect selectedImage={characterImage} 
+            setSelectedImage={setCharacterImage} />}/>
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>

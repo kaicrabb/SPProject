@@ -49,6 +49,12 @@ const contactSchema = new mongoose.Schema({
     Score: {
         type: Number
     },
+    selectedCharacter: {
+        type: String
+    },
+    deadSprite: {
+        type: String
+    },
 });
 
 // Create the Contact model
@@ -217,6 +223,34 @@ app.post('/submit-score', authenticateToken, async (req, res) => {
         res.json({ message: 'Score is not higher than the current score.' });
     } catch (err) {
         console.error('Error updating score:', err);
+        res.status(500).json({ message: 'Internal server error', error: err.message });
+    }
+});
+
+app.post('/submit-character', authenticateToken, async (req, res) => {
+    const { character, deadSprite } = req.body;
+
+    if (!character || !deadSprite) {
+        return res.status(400).json({ message: 'Character and deadSprite are required.' });
+    }
+
+    try {
+        console.log('Looking for user with username:', req.user.username); // Debug log
+        const user = await Contact.findOne({ Username: req.user.username }); // Replace `Username` with your field name
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Update the character and dead sprite
+        user.selectedCharacter = character;
+        user.deadSprite = deadSprite;
+
+        await user.save();
+
+        return res.json({ message: 'Character selection saved successfully!' });
+    } catch (err) {
+        console.error('Error saving character selection:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
