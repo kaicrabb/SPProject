@@ -59,7 +59,7 @@ function CharacterSelect({ setSelectedImage }) {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Character saved successfully:', data.message);
-                navigate('/next-page'); // Navigate to the next page after submission
+                navigate('/game'); 
             } else {
                 throw new Error('Failed to save character.');
             }

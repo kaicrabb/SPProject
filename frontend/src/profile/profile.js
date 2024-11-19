@@ -67,6 +67,10 @@ function Profile({ selectedImage, setSelectedImage }) {
     navigate('/dashboard');  // Redirect to dashboard page
   };
 
+  const handleCharSelect = () =>{
+    navigate('/CharacterSelect');
+  };
+
   const handleImageChange = (e) => {
     const selected = e.target.value;
     setSelectedImage(selected); // Update the App-level state instantly
@@ -104,6 +108,9 @@ function Profile({ selectedImage, setSelectedImage }) {
           </div>
           <button onClick={handleLogout} style={{ fontFamily: 'Silkscreen', color: 'black' }}>
             Logout
+          </button>
+          <button onClick={handleCharSelect} style={{ fontFamily: 'Silkscreen', color: 'black' }}>
+            Character Select
           </button>
           <button onClick={handlegame} style={{ fontFamily: 'Silkscreen', color: 'black' }}>
             Back to game

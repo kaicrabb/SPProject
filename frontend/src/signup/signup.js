@@ -71,7 +71,7 @@ function SignUp() {
         if (loginResponse.ok) {
           // Store the token in local storage
           localStorage.setItem('token', loginResult.token);
-          navigate('/game'); // Navigate to game screen
+          navigate('/CharacterSelect'); // Navigate to Character Select
         } else {
           setError(loginResult.message || 'Login failed after sign-up');
         }
