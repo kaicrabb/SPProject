@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getCharacterImages } from './fetch_character'; // Assumed fetch function for images
-
+import React, { useEffect, useState, useRef } from 'react';
+import { getCharacterImages } from './fetch_character';
 import box1ImgSrc from './img/Crate1.png';
 import box2ImgSrc from './img/Crate2.png';
 import box3ImgSrc from './img/Crate3.png';
@@ -12,49 +11,19 @@ function Game() {
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const token = localStorage.getItem('token');
 
-  // Initialize game variables
-  const boardWidth = 750;
-  const boardHeight = 250;
-  let board;
-  let context;
+  // Game variables stored in refs
+  const boardRef = useRef(null);
+  const contextRef = useRef(null);
+  const gameOverRef = useRef(false);
+  const scoreRef = useRef(0);
+  const boxArrayRef = useRef([]);
+  const cyborgRef = useRef({ x: 50, y: 156, width: 88, height: 94 });
 
-  const cyborgWidth = 88;
-  const cyborgHeight = 94;
-  const cyborgX = 50;
-  const cyborgY = boardHeight - cyborgHeight;
-
-  let cyborg = { x: cyborgX, y: cyborgY, width: cyborgWidth, height: cyborgHeight };
-
-  let boxArray = [];
-  const box1Width = 34;
-  const box2Width = 69;
-  const box3Width = 102;
-  const boxHeight = 70;
-  const boxX = 700;
-  const boxY = boardHeight - boxHeight;
-
-  let velocityX = -8;
-  let velocityY = 0;
+  const [cyborgImg, setCyborgImg] = useState(new Image());
+  const [cyborgDeadImg, setCyborgDeadImg] = useState(new Image());
+  const velocityRef = useRef({ x: -8, y: 0 });
   const gravity = 0.4;
 
-  let gameOver = false;
-  let score = 0;
-  let scoreSent = false;
-
-  let cyborgImg = new Image();
-  let cyborgDeadImg = new Image();
-  let box1Img = new Image();
-  let box2Img = new Image();
-  let box3Img = new Image();
-  let backgroundImg = new Image();
-
-  // Load static images
-  box1Img.src = box1ImgSrc;
-  box2Img.src = box2ImgSrc;
-  box3Img.src = box3ImgSrc;
-  backgroundImg.src = backgroundImgSrc;
-
-  // Fetch character images from the backend
   useEffect(() => {
     async function fetchCharacter() {
       try {
@@ -65,132 +34,148 @@ function Game() {
         console.error('Error fetching character images:', error);
       }
     }
-
     fetchCharacter();
   }, [token]);
 
-  // Load images once character images are fetched
   useEffect(() => {
     if (cyborgImgSrc && cyborgDeadImgSrc) {
-      cyborgImg.src = cyborgImgSrc;
-      cyborgDeadImg.src = cyborgDeadImgSrc;
-
-      // Ensure both images are loaded before starting the game loop
+      const img = new Image();
+      const deadImg = new Image();
       let loadedImages = 0;
 
-      cyborgImg.onload = () => {
+      const checkAllLoaded = () => {
         loadedImages++;
-        if (loadedImages === 2) {
-          setImagesLoaded(true);
-        }
+        if (loadedImages === 2) setImagesLoaded(true);
       };
 
-      cyborgDeadImg.onload = () => {
-        loadedImages++;
-        if (loadedImages === 2) {
-          setImagesLoaded(true);
-        }
-      };
+      img.onload = checkAllLoaded;
+      deadImg.onload = checkAllLoaded;
+
+      img.src = cyborgImgSrc;
+      deadImg.src = cyborgDeadImgSrc;
+
+      setCyborgImg(img);
+      setCyborgDeadImg(deadImg);
     }
   }, [cyborgImgSrc, cyborgDeadImgSrc]);
 
-  // Setup board and background once images are loaded
   useEffect(() => {
     if (imagesLoaded) {
-      board = document.getElementById('board');
-      board.height = boardHeight;
-      board.width = boardWidth;
+      const board = document.getElementById('board');
+      board.height = 250;
+      board.width = 750;
       board.style.background = `url(${backgroundImgSrc}) no-repeat center center fixed`;
       board.style.backgroundSize = 'cover';
 
-      context = board.getContext('2d');
+      const context = board.getContext('2d');
+      boardRef.current = board;
+      contextRef.current = context;
+
+      const handleKeyDown = (e) => moveCyborg(e);
+      document.addEventListener('keydown', handleKeyDown);
+
+      const interval = setInterval(placeBox, 1000);
       requestAnimationFrame(update);
-      setInterval(placeBox, 1000);
-      document.addEventListener('keydown', moveCyborg);
+
+      return () => {
+        clearInterval(interval);
+        document.removeEventListener('keydown', handleKeyDown);
+      };
     }
   }, [imagesLoaded]);
 
-  // Update game frame
   function update() {
-    if (!imagesLoaded) return;
-    requestAnimationFrame(update);
+    if (!imagesLoaded || gameOverRef.current) return;
 
-    if (gameOver) {
-      if (!scoreSent) {
-        sendScore(token, score);
-        scoreSent = true;
-      }
-      return;
-    }
+    const context = contextRef.current;
+    const cyborg = cyborgRef.current;
+    const velocity = velocityRef.current;
 
-    context.clearRect(0, 0, boardWidth, boardHeight);
-    velocityY += gravity;
-    cyborg.y = Math.min(cyborg.y + velocityY, cyborgY);
-    
-    // Draw the cyborg image (ensure it's loaded before drawing)
-    if (cyborgImg.complete) {
-      context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
-    } else {
-      // In case the image hasn't fully loaded
-      console.log("Image not loaded yet");
-    }
+    context.clearRect(0, 0, 750, 250);
+    velocity.y += gravity;
+    cyborg.y = Math.min(cyborg.y + velocity.y, 156);
 
-    for (let i = 0; i < boxArray.length; i++) {
-      let box = boxArray[i];
-      box.x += velocityX;
+    context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
+
+    boxArrayRef.current = boxArrayRef.current.filter((box) => box.x + box.width > 0);
+    boxArrayRef.current.forEach((box) => {
+      box.x += velocity.x;
       context.drawImage(box.img, box.x, box.y, box.width, box.height);
 
       if (detectCollision(cyborg, box)) {
-        gameOver = true;
-        cyborgImg.src = cyborgDeadImgSrc;
-        cyborgImg.onload = function () {
-          context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
-        };
-      }
-    }
+        gameOverRef.current = true;
 
+        // Draw the dead version without altering the cyborgImg.src permanently
+        context.drawImage(cyborgDeadImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
+
+        return; // Stop further updates after a collision
+      }
+    });
+
+    scoreRef.current++;
     context.fillStyle = 'white';
     context.font = '20px Silkscreen';
-    score++;
-    context.fillText(score, 5, 20);
+    context.fillText(scoreRef.current, 5, 20);
+
+    requestAnimationFrame(update);
   }
 
-  // Move cyborg on key press
   function moveCyborg(e) {
-    if (gameOver) return;
-    if ((e.code === 'Space' || e.code === 'ArrowUp') && cyborg.y === cyborgY) {
-      velocityY = -10;
+    if (gameOverRef.current) return;
+    if ((e.code === 'Space' || e.code === 'ArrowUp') && cyborgRef.current.y === 156) {
+      velocityRef.current.y = -10;
     }
   }
 
-  // Place new box on the screen
   function placeBox() {
-    if (gameOver) return;
+    if (gameOverRef.current) return;
 
-    let box = { img: null, x: boxX, y: boxY, width: null, height: boxHeight };
-    let placeBoxChance = Math.random();
+    const random = Math.random();
+    const box = {
+      img: new Image(),
+      x: 750,
+      y: 180,
+      width: 34,
+      height: 70,
+    };
 
-    if (placeBoxChance > 0.9) {
-      box.img = box3Img;
-      box.width = box3Width;
-    } else if (placeBoxChance > 0.7) {
-      box.img = box2Img;
-      box.width = box2Width;
-    } else if (placeBoxChance > 0.5) {
-      box.img = box1Img;
-      box.width = box1Width;
+    if (random > 0.9) {
+      box.img.src = box3ImgSrc;
+      box.width = 102;
+    } else if (random > 0.7) {
+      box.img.src = box2ImgSrc;
+      box.width = 69;
+    } else {
+      box.img.src = box1ImgSrc;
+      box.width = 34;
     }
 
-    if (box.img) {
-      boxArray.push(box);
-    }
-
-    if (boxArray.length > 5) {
-      boxArray.shift();
-    }
+    boxArrayRef.current.push(box);
   }
 
-  // Detect collision between cyborg and box
+  function resetGame() {
+    gameOverRef.current = false;
+    scoreRef.current = 0;
+    velocityRef.current = { x: -8, y: 0 };
+    cyborgRef.current.y = 156; // Reset cyborg to ground position
+    boxArrayRef.current = []; // Clear all obstacles
+
+    // Reset to alive image
+    const img = new Image();
+    img.src = cyborgImgSrc;
+    img.onload = () => {
+      setCyborgImg(img); // Ensure cyborgImg is reset to the alive version
+    };
+
+    // Clear and reset the canvas
+    const context = contextRef.current;
+    context.clearRect(0, 0, 750, 250); // Clear the canvas
+    context.drawImage(img, cyborgRef.current.x, cyborgRef.current.y, cyborgRef.current.width, cyborgRef.current.height);
+
+    // Restart the game loop
+    requestAnimationFrame(update);
+  }
+
   function detectCollision(a, b) {
     return (
       a.x < b.x + b.width &&
@@ -200,66 +185,17 @@ function Game() {
     );
   }
 
-  // Send score to backend
-  async function sendScore(token, score) {
-    try {
-      const response = await fetch('http://localhost:3000/submit-score', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ score }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to submit score.');
-      }
-    } catch (error) {
-      console.error('Error submitting score:', error);
-    }
-  }
-
-  // Reset the game state
-  function resetGame() {
-    gameOver = false;
-    score = 0;
-    scoreSent = false;
-    velocityY = 0;
-    velocityX = -8;
-    cyborg.y = cyborgY;
-    cyborgImg.src = cyborgImgSrc;
-    cyborgDeadImg.src = cyborgDeadImgSrc; // Reset dead image source
-    boxArray = [];
-
-    // Ensure board context is reset and new game state is drawn
-    if (context) {
-      context.clearRect(0, 0, boardWidth, boardHeight);
-      context.drawImage(cyborgImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
-    }
-  }
-
-  useEffect(() => {
-    const resetButton = document.getElementById('resetButton');
-    if (resetButton) {
-      resetButton.addEventListener('click', resetGame);
-    }
-    return () => {
-      if (resetButton) {
-        resetButton.removeEventListener('click', resetGame);
-      }
-    };
-  }, []);
-
   return (
     <div style={styles.gameWrapper}>
       <div style={styles.canvasWrapper}>
         <canvas id="board" style={styles.canvas}></canvas>
         <img
-  id="resetButton"
-  src="/Reset.png"
-  alt="Reset"
-  style={styles.resetButton}
-/>
+          id="resetButton"
+          src="/Reset.png"
+          alt="Reset"
+          style={styles.resetButton}
+          onClick={resetGame}
+        />
       </div>
     </div>
   );

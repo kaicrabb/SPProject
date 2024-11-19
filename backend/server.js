@@ -262,7 +262,7 @@ app.get('/get-character', authenticateToken, async (req, res) => {
         
         // Find the user from the database
         const user = await Contact.findOne({ Username: req.user.username }); // Replace `Username` with your field name
-
+    
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
