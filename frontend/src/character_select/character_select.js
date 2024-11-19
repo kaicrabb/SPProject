@@ -37,7 +37,12 @@ function CharacterSelect({ setSelectedImage }) {
             alert('Please select a character first.');
             return;
         }
-
+    
+        // Log the selected character and the constructed deadSprite
+        console.log('Selected Character:', selectedCharacter);
+        const deadSprite = `/charactericons/${selectedCharacter.name.toLowerCase()}-dead.png`;
+        console.log('Dead Sprite:', deadSprite);
+    
         try {
             const response = await fetch('http://localhost:3000/submit-character', {
                 method: 'POST',
@@ -47,10 +52,10 @@ function CharacterSelect({ setSelectedImage }) {
                 },
                 body: JSON.stringify({
                     character: selectedCharacter.src,
-                    deadSprite: `${selectedCharacter.name.toLowerCase()}-dead.png`,
+                    deadSprite: deadSprite, // Using the computed deadSprite value
                 }),
             });
-
+    
             if (response.ok) {
                 const data = await response.json();
                 console.log('Character saved successfully:', data.message);
@@ -59,7 +64,7 @@ function CharacterSelect({ setSelectedImage }) {
                 throw new Error('Failed to save character.');
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error saving character:', error);
         }
     };
 

@@ -14,6 +14,8 @@ const dayjs = require('dayjs');
 // environment variable.
 const SECRET_KEY = '9995c54a0d9b41cd38286daaf84be08f9e1ff76e4d04ffb3e3470a19f11d4a592164c6ba28d06536a6814790eaa8eabd4ad34eb09469a80d10f9bb33160502ad'; 
 
+app.use(express.static('public'));  // Serve static files from the 'public' folder
+
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
@@ -251,6 +253,27 @@ app.post('/submit-character', authenticateToken, async (req, res) => {
         return res.json({ message: 'Character selection saved successfully!' });
     } catch (err) {
         console.error('Error saving character selection:', err);
+        res.status(500).json({ message: 'Internal server error', error: err.message });
+    }
+});
+app.get('/get-character', authenticateToken, async (req, res) => {
+    try {
+        console.log('Looking for user with username:', req.user.username); // Debug log
+        
+        // Find the user from the database
+        const user = await Contact.findOne({ Username: req.user.username }); // Replace `Username` with your field name
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Send the character and deadSprite back as a response
+        return res.json({
+            selectedCharacter: user.selectedCharacter,
+            deadSprite: user.deadSprite
+        });
+    } catch (err) {
+        console.error('Error retrieving character data:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
