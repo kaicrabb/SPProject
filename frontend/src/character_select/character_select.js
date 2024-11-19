@@ -10,6 +10,8 @@ function CharacterSelect({ setSelectedImage }) {
   const CharacterImages = [
     { name: 'Tiny', src: '/charactericons/tiny.png' },
     { name: 'Cyborg', src: '/charactericons/cyborg.png' },
+    { name: 'Hedgehog', src: '/charactericons/hedgehog.png'},
+    { name: 'Giant', src: '/charactericons/giant.png'},
     // Add more character sprites here, place the images in the public charactericons folder,
     // name image files in all lowercase "name.png" and "name-dead.png" where name is whatever you want it to be
   ];
@@ -69,6 +71,7 @@ function CharacterSelect({ setSelectedImage }) {
   return (
     <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center' }}>
       <h1>Select Your Character</h1>
+      <p style={{fontSize: '14px', color: 'white' }}>Note: all hitboxes are the same regardless of sprite size</p>
       {selectedCharacter && (
         <h2 style={{ marginBottom: '20px', color: 'gold' }}>{selectedCharacter.name}</h2>
       )}
