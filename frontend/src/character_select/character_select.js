@@ -40,41 +40,41 @@ function CharacterSelect({ setSelectedImage }) {
       alert('Please select a character first.');
       return;
     }
-
+    // make a path to the deadsprite by taking taking name of the chosen sprite
     const deadSprite = `/charactericons/${selectedCharacter.name.toLowerCase()}-dead.png`;
 
-    try {
+    try { // try to send the paths back to the database
       const response = await fetch('http://localhost:3000/submit-character', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-        },
+        },// set both paths to be strings and send them
         body: JSON.stringify({
           character: selectedCharacter.src,
           deadSprite,
         }),
       });
 
-      if (response.ok) {
+      if (response.ok) { // make sure the character images were saved
         const data = await response.json();
         console.log('Character saved successfully:', data.message);
-        navigate('/game');
-      } else {
+        navigate('/game'); // bring the player to the game
+      } else {// notify the user that the character wasn't saved
         throw new Error('Failed to save character.');
       }
-    } catch (error) {
+    } catch (error) {// check for any other error that cuased them not ot be saved
       console.error('Error saving character:', error);
     }
   };
 
-  return (
+  return (// set up some html for the page
     <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center' }}>
       <h1>Select Your Character</h1>
       <p style={{fontSize: '14px', color: 'white' }}>Note: all hitboxes are the same regardless of sprite size</p>
       {selectedCharacter && (
         <h2 style={{ marginBottom: '20px', color: 'gold' }}>{selectedCharacter.name}</h2>
-      )}
+      )} 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
         {CharacterImages.map((character, index) => (
           <div

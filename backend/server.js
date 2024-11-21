@@ -1,12 +1,12 @@
 // Importing required modules
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs'); // Import bcrypt for encryption
+const mongoose = require("mongoose"); // Import mongoose for the database
 const cors = require('cors'); // Importing cors module
 const app = express();
-const bodyParser = require("body-parser");
-const jwt = require('jsonwebtoken');
-const dayjs = require('dayjs');
+const bodyParser = require("body-parser"); // Import body-parser for middleware
+const jwt = require('jsonwebtoken'); // Import jsonwebtoken for tokenization
+const dayjs = require('dayjs'); // Import dayjs for properly storing dates in database
 
 // For the purposes of making this easier to use while developing and allowing
 // ease of use for grading in this class we are not hiding the SECRET_KEY.
@@ -28,33 +28,33 @@ mongoose.connect("mongodb://localhost:27017/userInfo", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-
+// turn on the mongodb connection
 mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
 });
 
-// Define the schema for User with a unique username
+// Define the schema for a user
 const contactSchema = new mongoose.Schema({
-    Username: { 
+    Username: { // requires users to create/have an account to login/signup
         type: String, 
         required: true, 
         unique: true // Ensure the username is unique
     },
-    Password: { 
+    Password: { // requires users to create/have a password to login/signup
         type: String, 
         required: true 
     },
-    DateCreated: { 
+    DateCreated: { //logs the date that an account was made
         type: String, default: () => dayjs().format('YYYY-MM-DD'), 
         required: true 
     },
-    Score: {
+    Score: { // Score from the game
         type: Number
     },
-    selectedCharacter: {
+    selectedCharacter: { // saves character image path from character select
         type: String
     },
-    deadSprite: {
+    deadSprite: { // saves character death image path from character selec
         type: String
     },
 });
@@ -66,38 +66,41 @@ const Contact = mongoose.model("Contact", contactSchema);
 app.post("/contact", async (req, res) => { 
     const { Username, Password } = req.body;
 
-    if (!Username || !Password) {
+    if (!Username || !Password) { // Print an error message if signup is missing username or password
         return res.status(400).json({ message: "Username and password are required" });
     }
-
+    // If a username and password are inputted continue
     try {
-        const existingContact = await Contact.findOne({ Username: Username });
+        const existingContact = await Contact.findOne({ Username: Username }); // check for an account with inputted name
         
-        if (existingContact) {
+        if (existingContact) { // If an account exists with that username give an error
             return res.status(400).json({ message: "Username already exists" });
         }
 
         // Hash the password asynchronously using bcrypt
         const hashedPassword = await bcrypt.hash(Password, 10);
 
+        // Save the information to new contact in the database
         const contact = new Contact({
             Username: Username,
             Password: hashedPassword,  // Save the hashed password, not the plain one
         });
 
-        await contact.save();
+        await contact.save(); //wait for the contact to be saved before continuing
 
+        // Give the user a token for 1 hr 
         const token = jwt.sign({ username: contact.Username }, SECRET_KEY, { expiresIn: '1h' });
 
+        //Send back a message that the user created their account, send token to the client
         res.json({ message: 'User created successfully', token });
 
-    } catch (err) {
+    } catch (err) { //check for other errors with saving the user data
         console.error('Error saving contact:', err);
         
-        if (err.code === 11000) {
+        if (err.code === 11000) { // error out if username exists already
             return res.status(400).json({ message: "Username already exists" });
         }
-
+        // return an error with the error message
         res.status(500).json({ message: "Internal server error", error: err.message });
     }
 });
@@ -106,58 +109,60 @@ app.post("/contact", async (req, res) => {
 app.post("/login", async (req, res) => {
     const { Username, Password } = req.body;
 
-    if (!Username || !Password) {
+    if (!Username || !Password) { // Check that user inputted both a Username and Password
         return res.status(400).json({ message: "Username and password are required" });
     }
-
+    // Try to log the user in
     try {
         // Find the user by username
         const user = await Contact.findOne({ Username: Username });
 
-        if (!user) {
+        if (!user) { 
+            // Check if the user doesn't exist, and tell them that the password or username is incorrect,
+            // don't want to give the user specific information incase it is an attacker
             return res.status(401).json({ message: "Invalid username or password" });
         }
 
         // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(Password, user.Password);
 
-        if (!isMatch) {
+        if (!isMatch) { //I f the password doesn't match do the same as if the user doesn't exist
             return res.status(401).json({ message: "Invalid username or password" });
         }
 
-        // Successfully logged in
+        // Successfully logged in, give the user a token for an hour
         const token = jwt.sign({ username: user.Username }, SECRET_KEY, { expiresIn: '1h' });
         res.json({ token });
-    } catch (err) {
+    } catch (err) { //Error checking if logging in doesn't work for some other reason
         console.error("Error during login:", err);
         res.status(500).json({ message: "Internal server error", error: err.message });
     }
 });
-
+//Add deleteAccount route
 app.delete("/deleteAccount", async (req, res) => {
     const { Username, Password } = req.body;
 
-    if (!Username || !Password) {
+    if (!Username || !Password) { // Make sure the both username and password are sent
         return res.status(400).json({ message: "Username and password are required" });
     }
 
-    try {
+    // Try to delete the account
+    try { 
         const user = await Contact.findOne({ Username: Username });
 
-        if (!user) {
+        if (!user) { // Do nothing if the account inputted doesn't exist
             return res.status(404).json({ message: "User not found" });
         }
-
+        // compare the inputted password to the hashed stored password 
         const isMatch = await bcrypt.compare(Password, user.Password);
 
-        if (!isMatch) {
+        if (!isMatch) { // if the password hashes don't match do nothing return invalid password message
             return res.status(401).json({ message: "Invalid password" });
         }
-
+        // delete the account
         await Contact.deleteOne({ Username: Username });
-
         res.json({ message: "Account deleted successfully" });
-    } catch (err) {
+    } catch (err) {// catch any errors that occur during deletion
         console.error("Error during account deletion:", err);
         res.status(500).json({ message: "Internal server error", error: err.message });
     }
@@ -179,91 +184,93 @@ const authenticateToken = (req, res, next) => {
     });
 };
   
-// Profile route that requires authentication
+// Profile route
 app.get('/profile', authenticateToken, async (req, res) => {
-    try {
+    try { // Try to find an account and fetch its data
         const user = await Contact.findOne({ Username: req.user.username });
         
-        if (!user) {
+        if (!user) { // Check to make sure a user was found
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json({
+        res.json({ // send the userdata we want sent
             username: user.Username,
             score: user.Score || "No score yet",  // Send "No score yet" if the score is null
             joined: user.DateCreated,
         });
-    } catch (err) {
+    } catch (err) { // check for any errors occuring during profile fetch
         console.error("Error fetching profile data:", err);
         res.status(500).json({ message: "Internal server error" });
     }
 });
-
+// Submit a score to the database based off the score in the game
 app.post('/submit-score', authenticateToken, async (req, res) => {
-    console.log(authenticateToken);
+    // get the score from the game
     const { score } = req.body;
     
-    try {
+    try { // Try to submit a score
         console.log('Looking for user with userId:', req.user.username);  // Log userId for debugging
         const user = await Contact.findOne({ Username: req.user.username })  // Get userId from the token 
 
-        if (!user) {
+        if (!user) { // find the user
             return res.status(404).json({ message: 'User not found' });
         }
-        if (!user.Score){
+        if (!user.Score){ // send the score into the database if the user doesn't already have a saved score
             user.Score = score;
             await user.save();
             return res.json({message: 'Score added'})
         }
-        // Check if the new score is higher than the existing score
+        // Check if the new score is higher than the existing score and save it if so
         if (score > user.Score) {
             user.Score = score;
             await user.save();
             return res.json({ message: 'Score updated successfully!' });
         }
-
+        // don't save the score if its lower than the old one
         res.json({ message: 'Score is not higher than the current score.' });
-    } catch (err) {
+    } catch (err) { // check for error in sending the score
         console.error('Error updating score:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
-
+// Save a selected character to the database
 app.post('/submit-character', authenticateToken, async (req, res) => {
-    const { character, deadSprite } = req.body;
+    const { character, deadSprite } = req.body; // get the the selected character sprite and dead-sprite
 
-    if (!character || !deadSprite) {
+    if (!character || !deadSprite) { // send message if no character is selected
         return res.status(400).json({ message: 'Character and deadSprite are required.' });
     }
 
-    try {
+    try { // try to save the character
         console.log('Looking for user with username:', req.user.username); // Debug log
         const user = await Contact.findOne({ Username: req.user.username }); // Replace `Username` with your field name
 
-        if (!user) {
+        if (!user) { // check if the user exists
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        // Update the character and dead sprite
+        // Update the character and dead sprite in the database
         user.selectedCharacter = character;
         user.deadSprite = deadSprite;
 
-        await user.save();
+        await user.save(); // save the sprites
 
         return res.json({ message: 'Character selection saved successfully!' });
-    } catch (err) {
+    } catch (err) { // check for the errors on character selection
         console.error('Error saving character selection:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
+
+//Get the character and pull them into the game
 app.get('/get-character', authenticateToken, async (req, res) => {
-    try {
+    try { // try pulling the character in
         console.log('Looking for user with username:', req.user.username); // Debug log
         
         // Find the user from the database
         const user = await Contact.findOne({ Username: req.user.username }); // Replace `Username` with your field name
     
-        if (!user) {
+        if (!user) { // check if a user is still selected
             return res.status(404).json({ message: 'User not found.' });
         }
 
@@ -272,7 +279,7 @@ app.get('/get-character', authenticateToken, async (req, res) => {
             selectedCharacter: user.selectedCharacter,
             deadSprite: user.deadSprite
         });
-    } catch (err) {
+    } catch (err) { // catch errors and send them back
         console.error('Error retrieving character data:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
