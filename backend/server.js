@@ -74,7 +74,7 @@ app.post("/contact", async (req, res) => {
         const existingContact = await Contact.findOne({ Username: Username }); // check for an account with inputted name
         
         if (existingContact) { // If an account exists with that username give an error
-            return res.status(400).json({ message: "Username already exists" });
+            return res.status(400).json({ message: "Username is invalid" });
         }
 
         // Hash the password asynchronously using bcrypt
