@@ -23,6 +23,8 @@ function Game() {
   const [cyborgDeadImg, setCyborgDeadImg] = useState(new Image());
   const velocityRef = useRef({ x: -8, y: 0 });
   const gravity = 0.4;
+  let scoreSent = false;
+  let score = 0;
 
   useEffect(() => {
     async function fetchCharacter() {
@@ -86,7 +88,6 @@ function Game() {
 
   function update() {
     if (!imagesLoaded || gameOverRef.current) return;
-
     const context = contextRef.current;
     const cyborg = cyborgRef.current;
     const velocity = velocityRef.current;
@@ -104,15 +105,19 @@ function Game() {
 
       if (detectCollision(cyborg, box)) {
         gameOverRef.current = true;
-
         // Draw the dead version without altering the cyborgImg.src permanently
         context.drawImage(cyborgDeadImg, cyborg.x, cyborg.y, cyborg.width, cyborg.height);
-
+        if (!scoreSent) {
+          sendScore(token, score+1);
+          scoreSent = true;
+          console.log ("sending score: ", score+1);
+        }
         return; // Stop further updates after a collision
       }
     });
 
     scoreRef.current++;
+    score++;
     context.fillStyle = 'white';
     context.font = '20px Silkscreen';
     context.fillText(scoreRef.current, 5, 20);
@@ -152,8 +157,27 @@ function Game() {
 
     boxArrayRef.current.push(box);
   }
+  // Send score to backend
+  async function sendScore(token, score) {
+    try {
+      const response = await fetch('http://localhost:3000/submit-score', {
+         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+         },
+        body: JSON.stringify({ score }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to submit score.');
+      }
+    } catch (error) {
+      console.error('Error submitting score:', error);
+    }
+  }
 
   function resetGame() {
+    
     gameOverRef.current = false;
     scoreRef.current = 0;
     velocityRef.current = { x: -8, y: 0 };
