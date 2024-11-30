@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'; 
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import SignUp from './signup/signup'; // Assuming you have a SignUp component
-import Login from './login/login'; // Assuming you have a Login component
+import SignUp from './signup/signup'; 
+import Login from './login/login'; 
+import UpdatePassword from './login/UpdatePassword';
 import './App.css'; // Import the CSS file for styling
 import DelAcc from './delete_account/delacc';
 import Profile from './profile/profile';
@@ -35,9 +36,6 @@ function App() {
             <Link to="/login">
               <button>Log In</button>
             </Link>
-            <Link to="/delacc">
-              <button>Delete Account</button>
-            </Link>
             <Link to="/profile">
               <img src={selectedImage} alt="Profile" style={{width: '50px',
                 height: '50px', cursor: 'pointer',}}/>
@@ -49,11 +47,12 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/delacc" element={<DelAcc />} />
+          <Route path="/delete-account" element={<DelAcc />} />
           <Route path="/profile" element={<Profile selectedImage={selectedImage} setSelectedImage={setSelectedImage}/>}/>
           <Route path="/game" element={<Game />} />
           <Route path="/CharacterSelect" element={<CharacterSelect selectedImage={characterImage} 
             setSelectedImage={setCharacterImage} />}/>
+          <Route path="update-password" element= {<UpdatePassword/>}/>
           {/* Add a fallback route for undefined routes */}
           <Route path="*" element={<h2>Welcome to our game!</h2>} />
         </Routes>

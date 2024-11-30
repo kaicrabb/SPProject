@@ -57,6 +57,9 @@ const contactSchema = new mongoose.Schema({
     deadSprite: { // saves character death image path from character selec
         type: String
     },
+    legacy: {// will be used so that old accounts are not locked out due to added password/username requirements
+        type: Boolean, default: false 
+    },
 });
 
 // Create the Contact model
@@ -112,6 +115,10 @@ app.post("/login", async (req, res) => {
     if (!Username || !Password) { // Check that user inputted both a Username and Password
         return res.status(400).json({ message: "Username and password are required" });
     }
+
+    // Password validation: at least 8 characters, one symbol, one uppercase, one lowercase
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
     // Try to log the user in
     try {
         // Find the user by username
@@ -119,25 +126,43 @@ app.post("/login", async (req, res) => {
 
         if (!user) { 
             // Check if the user doesn't exist, and tell them that the password or username is incorrect,
-            // don't want to give the user specific information incase it is an attacker
+            // don't want to give the user specific information in case it is an attacker
             return res.status(401).json({ message: "Invalid username or password" });
         }
 
         // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(Password, user.Password);
 
-        if (!isMatch) { //I f the password doesn't match do the same as if the user doesn't exist
+        if (!isMatch) { // If the password doesn't match, return an error
             return res.status(401).json({ message: "Invalid username or password" });
         }
 
-        // Successfully logged in, give the user a token for an hour
+        // Check if the password meets new strong criteria
+        const isLegacy = !strongPasswordRegex.test(Password);
+
+        // If it's a legacy password, mark the user as legacy, but still allow them to log in
+        if (isLegacy && !user.legacy) {
+            user.legacy = true;
+            await user.save();
+        }
+
+        // Successfully logged in, generate a token (whether legacy or not)
         const token = jwt.sign({ username: user.Username }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ token });
-    } catch (err) { //Error checking if logging in doesn't work for some other reason
+
+        res.json({
+            token,
+            passwordStrength: isLegacy ? 'legacy' : 'strong',  // Send the legacy status
+            message: 'Login successful!',
+        });
+    } catch (err) { // Error handling for unexpected issues
         console.error("Error during login:", err);
         res.status(500).json({ message: "Internal server error", error: err.message });
     }
 });
+
+
+
+
 //Add deleteAccount route
 app.delete("/deleteAccount", async (req, res) => {
     const { Username, Password } = req.body;
@@ -183,6 +208,47 @@ const authenticateToken = (req, res, next) => {
         next();  // Proceed to the next middleware or route handler
     });
 };
+app.post('/update-password', authenticateToken, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        // Find the user based on their Username
+        const user = await Contact.findOne({ Username: req.user.username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verify old password
+        const isMatch = await bcrypt.compare(oldPassword, user.Password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid old password' });
+        }
+
+        // Validate new password
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongPasswordRegex.test(newPassword)) {
+            return res.status(400).json({ message: 'New password does not meet the requirements (min 8 characters, 1 symbol, 1 uppercase, 1 lowercase)' });
+        }
+
+        // Update password if valid
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.Password = hashedPassword;
+
+        // Reset legacy flag if applicable
+        if (user.legacy) {
+            user.legacy = false;  // Reset legacy flag if user has legacy status
+        }
+
+        // Save the updated user data
+        await user.save();
+
+        res.status(200).json({ message: 'Password updated successfully!' });
+
+    } catch (error) {
+        console.error('Error updating password:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
   
 // Profile route
 app.get('/profile', authenticateToken, async (req, res) => {
@@ -211,7 +277,7 @@ app.post('/submit-score', authenticateToken, async (req, res) => {
     try { // Try to submit a score
         console.log('Looking for user with userId:', req.user.username);  // Log userId for debugging
         const user = await Contact.findOne({ Username: req.user.username })  // Get userId from the token 
-
+        
         if (!user) { // find the user
             return res.status(404).json({ message: 'User not found' });
         }
@@ -269,7 +335,8 @@ app.get('/get-character', authenticateToken, async (req, res) => {
         
         // Find the user from the database
         const user = await Contact.findOne({ Username: req.user.username }); // Replace `Username` with your field name
-    
+
+        console.log('user is: ', user);
         if (!user) { // check if a user is still selected
             return res.status(404).json({ message: 'User not found.' });
         }

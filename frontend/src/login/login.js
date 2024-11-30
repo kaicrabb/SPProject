@@ -33,12 +33,24 @@ function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
+    
         if (!username || !password) {
             setError('Username and password are required');
             return;
         }
-
+    
+        // Username validation: only letters, numbers, and underscores
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    
+        // Password validation: at least 8 characters, one symbol, one uppercase, one lowercase
+        //const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    
+        if (!usernameRegex.test(username)) {
+            setError('Username can only contain letters, numbers, and underscores.');
+            return;
+        }
+        
+    
         try {
             const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
@@ -47,13 +59,14 @@ function Login() {
                 },
                 body: JSON.stringify({ Username: username, Password: password }),
             });
-
+    
             const result = await response.json();
-
+    
             if (response.ok) {
                 const token = result.token;
                 localStorage.setItem('token', token);
-
+                localStorage.setItem('username', result.Username);
+    
                 // Preload character images
                 try {
                     await getCharacterImages(token);
@@ -61,19 +74,27 @@ function Login() {
                 } catch (err) {
                     console.error('Error preloading character images:', err);
                 }
-
-                setSuccess('Login successful!');
-                alert('Login Successful!');
-                setUsername('');
-                setPassword('');
-                navigate('/game');
+    
+                // Check if the account uses legacy passwords
+                if (result.passwordStrength === 'legacy') {
+                    alert(
+                        'Your account is using an old password. Please update your password for enhanced security.'
+                    );
+                    navigate('/update-password'); // Redirect to password update page
+                } else {
+                    setSuccess('Login successful!');
+                    alert('Login Successful!');
+                    setUsername('');
+                    setPassword('');
+                    navigate('/game');
+                }
             } else {
                 setError(result.message || 'Invalid username or password');
             }
         } catch (err) {
             setError('An error occurred while logging in.');
         }
-    };
+    };    
 
     return (
         <div>

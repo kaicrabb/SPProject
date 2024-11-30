@@ -40,6 +40,23 @@ function SignUp() {
       setError('Username and password are required');
       return;
     }
+    // Username validation: only letters, numbers, and underscores
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+
+    // Password validation: at least 8 characters, one symbol, one uppercase, one lowercase
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!usernameRegex.test(username)) {
+      setError('Username can only contain letters, numbers, and underscores.');
+      return;
+    }
+
+    if (!passwordRegex.test(password)) {
+      setError(
+        'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.'
+      );
+      return;
+    }
 
     try {
       // Send POST request to backend API (Express)
@@ -71,6 +88,7 @@ function SignUp() {
         if (loginResponse.ok) {
           // Store the token in local storage
           localStorage.setItem('token', loginResult.token);
+          localStorage.setItem('username', result.Username);
           navigate('/CharacterSelect'); // Navigate to Character Select
         } else {
           setError(loginResult.message || 'Login failed after sign-up');

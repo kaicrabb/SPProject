@@ -1,4 +1,4 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 .profile-container {
     width: 300px;
     margin: 0 auto;
@@ -6,6 +6,52 @@
     background: #f4f4f4;
     border-radius: 8px;
   }
+/* Default button style */
+button {
+  font-family: 'Silkscreen', sans-serif;
+  color: black;
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #333;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  text-align: center;
+  display: inline-block;
+  width: 250px;
+  height: 50px;
+  box-sizing: border-box;
+  transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effect: invert colors and increase border */
+button:hover {
+  color: #f0f0f0; /* Invert text color */
+  background-color: black; /* Invert background color */
+  border: 7px solid #f0f0f0; /* Increase border size */
+}
+
+  /* Fade-in animation */
+@keyframes fadeInButtons {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Fade-out animation */
+@keyframes fadeOutButtons {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
   
   h2 {
     text-align: center;
@@ -25,16 +71,7 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
-  button {
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
+ 
   button:disabled {
     background-color: #ccc;
   }
