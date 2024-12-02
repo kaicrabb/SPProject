@@ -352,6 +352,39 @@ app.get('/get-character', authenticateToken, async (req, res) => {
     }
 });
 
+
+app.get('/leaderboard', authenticateToken, async (req, res) => {
+    try {
+        // Fetch all users and their scores
+        const users = await Contact.find({}, { Username: 1, Score: 1 }).lean();
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No scores found' });
+        }
+
+        // Sort users by score in descending order
+        const sortedUsers = users.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+
+        // Find the current user
+        const currentUser = sortedUsers.find(user => user.Username === req.user.username);
+
+        res.json({
+            scores: sortedUsers.map(user => ({
+                username: user.Username,
+                score: user.Score || 0, // Default score to 0 if null or undefined
+            })),
+            currentUser: currentUser ? {
+                username: currentUser.Username,
+                score: currentUser.Score || 0,
+            } : null,
+        });
+    } catch (err) {
+        console.error('Error fetching leaderboard:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 // Start the server
 app.listen(5000, () => { 
     console.log("Server started on port 5000");

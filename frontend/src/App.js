@@ -8,6 +8,7 @@ import DelAcc from './delete_account/delacc';
 import Profile from './profile/profile';
 import Game from './game/game';
 import CharacterSelect from './character_select/character_select';
+import Leaderboard from './leaderboard/leaderboard';
 
 function App() {
   // State is still here if you decide to add functionality later
@@ -36,6 +37,9 @@ function App() {
             <Link to="/login">
               <button>Log In</button>
             </Link>
+            <Link to="/leaderboard">
+              <button>Leaderboards</button>
+            </Link>
             <Link to="/profile">
               <img src={selectedImage} alt="Profile" style={{width: '50px',
                 height: '50px', cursor: 'pointer',}}/>
@@ -50,6 +54,8 @@ function App() {
           <Route path="/delete-account" element={<DelAcc />} />
           <Route path="/profile" element={<Profile selectedImage={selectedImage} setSelectedImage={setSelectedImage}/>}/>
           <Route path="/game" element={<Game />} />
+          <Route path="/leaderboard" element={<Leaderboard/>}/>
+
           <Route path="/CharacterSelect" element={<CharacterSelect selectedImage={characterImage} 
             setSelectedImage={setCharacterImage} />}/>
           <Route path="update-password" element= {<UpdatePassword/>}/>
