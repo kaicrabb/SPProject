@@ -9,8 +9,6 @@ function SignUp() {
 
   const navigate = useNavigate();
 
-  const backendURL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-
   useEffect(() => {
     // Step 1: Dynamically inject the Google Font into the document
     const link = document.createElement('link');
@@ -62,7 +60,7 @@ function SignUp() {
 
     try {
       // Send POST request to backend API (Express)
-      const response = await fetch(`${backendURL}contact`, {
+      const response = await fetch('http://localhost:5000/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +75,8 @@ function SignUp() {
         alert('Account Created!');
         setUsername('');
         setPassword('');
-        const loginResponse = await fetch(`${backendURL}login`, {
+        
+        const loginResponse = await fetch('http://localhost:5000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
