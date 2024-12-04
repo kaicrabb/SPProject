@@ -17,12 +17,12 @@ const SECRET_KEY = '9995c54a0d9b41cd38286daaf84be08f9e1ff76e4d04ffb3e3470a19f11d
 
 app.use(express.static('public'));  // Serve static files from the 'public' folder
 
-const server = http.createServer(app);
+/*const server = http.createServer(app);
 server.on('upgrade', (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, (ws) => {
         wss.emit('connection', ws, request);
     });
-});
+});*/
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
