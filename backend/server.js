@@ -19,28 +19,19 @@ app.use(express.static('public'));  // Serve static files from the 'public' fold
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
-// Configure CORS options
-const corsOptions = {
-    origin: 'http://localhost:5000', // Allow requests from this origin
-    methods: 'GET,POST,PUT,DELETE,FETCH', // Specify allowed methods
-    allowedHeaders: 'Content-Type,Authorization', // Specify allowed headers
-  };
-  
-  // Use CORS middleware
-app.use(cors(corsOptions))
+// Enable CORS for all origins (or specify your frontend URL)
+// This will allow requests from all origins (e.g., localhost:3000).
+app.use(cors());  // Allows CORS from all origins by default
 
-// MongoDb Connection
-const uri = "mongodb+srv://christophercarter2004x:wqcDXR70t3DFDkht@cluster0.skivm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log("Connected to MongoDB Atlas");
-}).catch((err) => {
-  console.error("Error connecting to MongoDB Atlas:", err);
+// MongoDB connection
+mongoose.connect("mongodb://localhost:27017/userInfo", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
-
+// turn on the mongodb connection
+mongoose.connection.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+});
 
 // Define the schema for a user
 const contactSchema = new mongoose.Schema({
@@ -395,6 +386,6 @@ app.get('/leaderboard', authenticateToken, async (req, res) => {
 
 
 // Start the server
-app.listen(5000, '0.0.0.0', () => { 
+app.listen(5000, () => { 
     console.log("Server started on port 5000");
 });
