@@ -7,6 +7,7 @@ const app = express();
 const bodyParser = require("body-parser"); // Import body-parser for middleware
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken for tokenization
 const dayjs = require('dayjs'); // Import dayjs for properly storing dates in database
+const wss = require('./websocketServer');
 
 // For the purposes of making this easier to use while developing and allowing
 // ease of use for grading in this class we are not hiding the SECRET_KEY.
@@ -16,8 +17,15 @@ const SECRET_KEY = '9995c54a0d9b41cd38286daaf84be08f9e1ff76e4d04ffb3e3470a19f11d
 
 app.use(express.static('public'));  // Serve static files from the 'public' folder
 
+const server = http.createServer(app);
+server.on('upgrade', (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+    });
+});
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
+
 
 // Configure CORS options
 const corsOptions = {
