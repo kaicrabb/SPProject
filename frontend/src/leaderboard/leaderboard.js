@@ -38,41 +38,43 @@ function Leaderboard() {
 
   const renderLeaderboard = () => {
     if (!scores) return null;
-
+  
     const top15 = scores.slice(0, 15); // Display top 15 users
-    let isCurrentUserIncluded = false;
-
+  
     const leaderboardRows = top15.map((user, index) => {
       const placement = index + 1;
-      if (currentUser && user.username === currentUser.username) {
-        isCurrentUserIncluded = true;
-      }
+      const isCurrentUser = currentUser && user.username === currentUser.username;
+  
       return (
-        <tr key={user.username}>
+        <tr
+          key={user.username}
+          style={isCurrentUser ? { color: 'gold', fontSize: 25 } : {}}
+        >
           <td>{placement}</td>
           <td>{user.username}</td>
           <td>{user.score}</td>
         </tr>
       );
     });
-
+  
     // Add the current user if not in top 15
-    if (currentUser && !isCurrentUserIncluded) {
+    if (currentUser && !top15.some((user) => user.username === currentUser.username)) {
       const currentUserPlacement = scores.findIndex(
         (user) => user.username === currentUser.username
       ) + 1;
-
+  
       leaderboardRows.push(
-        <tr key="current-user" style={{ color: 'gold', fontSize: 25}}>
+        <tr key="current-user" style={{ color: 'gold', fontSize: 25 }}>
           <td>{currentUserPlacement}</td>
           <td>{currentUser.username}</td>
           <td>{currentUser.score}</td>
         </tr>
       );
     }
-
+  
     return leaderboardRows;
   };
+  
   const handlegame = () => {
     navigate('/game')
   }
