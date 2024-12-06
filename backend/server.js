@@ -208,6 +208,8 @@ const authenticateToken = (req, res, next) => {
         next();  // Proceed to the next middleware or route handler
     });
 };
+
+// Update password function
 app.post('/update-password', authenticateToken, async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
@@ -250,7 +252,7 @@ app.post('/update-password', authenticateToken, async (req, res) => {
     }
 });
   
-// Profile route
+// Profile function
 app.get('/profile', authenticateToken, async (req, res) => {
     try { // Try to find an account and fetch its data
         const user = await Contact.findOne({ Username: req.user.username });
