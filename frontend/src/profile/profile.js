@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 function Profile({ selectedImage, setSelectedImage }) {
   const [userInfo, setUserInfo] = useState(null);  // Store user information
   const [error, setError] = useState('');  // For handling errors
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // For navigating to other pages
 
-  const profileImages = [
+  const profileImages = [ // set a predefined list of profile images
     '/profileicons/profiledefault.png',
     '/profileicons/profilecreeps.png',
     '/profileicons/profileflat.png',
@@ -19,7 +19,7 @@ function Profile({ selectedImage, setSelectedImage }) {
   ];
 
 
-  useEffect(() => {
+  useEffect(() => { // get the Silkscreen display optionsadded to the page
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Silkscreen&display=swap';
     link.rel = 'stylesheet';
@@ -30,7 +30,7 @@ function Profile({ selectedImage, setSelectedImage }) {
     };
   }, []);  
 
-  useEffect(() => {
+  useEffect(() => { // Fetch the current users info
     const fetchUserInfo = async () => {
       try {
         // Send GET request to backend API to retrieve user information
@@ -42,14 +42,15 @@ function Profile({ selectedImage, setSelectedImage }) {
           }
         });
 
+        // if response is ok await data and then continue
         if (response.ok) {
           const data = await response.json();
           setUserInfo(data);  // Store user data
-        } else {
+        } else { // If the response failed for some reason error
           setError('Failed to load user information');
           navigate('/login');  // Redirect to login if the token is invalid
         }
-      } catch (err) {
+      } catch (err) { // If the connection to the database failed for some reason
         setError('An error occurred while fetching user information.');
       }
     };
@@ -57,6 +58,7 @@ function Profile({ selectedImage, setSelectedImage }) {
     fetchUserInfo();
   }, [navigate]);
   
+  // Set up game redirection
   const handlegame = () => {
     navigate('/game')
   }
@@ -68,24 +70,29 @@ function Profile({ selectedImage, setSelectedImage }) {
     navigate('/dashboard');  // Redirect to dashboard page
   };
 
+  // Set up Character Select redirect
   const handleCharSelect = () =>{
     navigate('/CharacterSelect');
   };
   
+  // Set up update password redirect
   const handleChangePass = () =>{
     navigate('/update-password');
   };
 
+  // Set up delete account redirect
   const handleDeleteAccount = () =>{
     navigate('/delete-account');
   };
 
+  // Handles the profile image change so that user doesn't have to refresh their browser to see it change for them
   const handleImageChange = (e) => {
     const selected = e.target.value;
     setSelectedImage(selected); // Update the App-level state instantly
     localStorage.setItem('profileImage', selected); // Save to localStorage
   };
 
+  // Set up a button style specifically for profile page that keeps buttons the same size so it looks better
   const buttonStyle = {
     fontFamily: 'Silkscreen',
     color: 'black',
@@ -109,16 +116,18 @@ function Profile({ selectedImage, setSelectedImage }) {
     <div>
       <h2 style={{ fontFamily: 'Silkscreen', textAlign: 'center', color: 'white' }}>User Profile</h2>
       {error && <p style={{ color: 'white', fontFamily: 'Silkscreen' }}>{error}</p>}
+      {/* Return basic player information */}
       {userInfo ? (
         <div style={{ fontFamily: 'Silkscreen', color: 'white' }}>
           <p><strong>Username:</strong> {userInfo.username}</p>
           <p><strong>HighScore:</strong> {userInfo.score}</p>
           <p><strong>Joined:</strong> {userInfo.joined}</p>
 
-          <div>
+          <div>{/* Set up profile image dropdown menu */}
             <label htmlFor="profile-image" style={{ display: 'block', margin: '10px 0' }}>
               Select Profile Image:
             </label>
+            {/* Change image to whichever image the user selects */}
             <select id="profileImage" value={selectedImage} onChange={handleImageChange}>
               {profileImages.map((image, index) => {
                 const imageName = image
@@ -135,6 +144,7 @@ function Profile({ selectedImage, setSelectedImage }) {
             </select>
           </div>
 
+          {/* Create a gridlike layout for the navigation buttons */}
           <div style={{
             display: 'flex',         // Flex container to align columns
             justifyContent: 'flex-start',  // Align columns to the left
@@ -155,7 +165,7 @@ function Profile({ selectedImage, setSelectedImage }) {
               </button>
             </div>
 
-            {/* Delete Account Button */}
+            {/* Delete Account Button Positioned on the right side of screen between other button rows */}
             <button 
               onClick={handleDeleteAccount} 
               style={{

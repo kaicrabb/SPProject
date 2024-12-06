@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { getCharacterImages } from './fetch_character';
-import box1ImgSrc from './img/Crate1.png';
-import box2ImgSrc from './img/Crate2.png';
-import box3ImgSrc from './img/Crate3.png';
-import backgroundImgSrc from './img/background.png';
+import { getCharacterImages } from './fetch_character'; // get character images
+import box1ImgSrc from './img/Crate1.png'; // import box image
+import box2ImgSrc from './img/Crate2.png'; // import box image
+import box3ImgSrc from './img/Crate3.png'; // import box image
+import backgroundImgSrc from './img/background.png'; // import background
 
 function Game() {
   const [cyborgImgSrc, setCyborgImgSrc] = useState(null);
@@ -26,47 +26,50 @@ function Game() {
   let scoreSent = false;
   let score = 0;
 
-  useEffect(() => {
+  // Get the character images before doing anything else
+  useEffect(() => { 
     async function fetchCharacter() {
-      try {
+      try { // try to get the images
         const { cyborgImgSrc, cyborgDeadImgSrc } = await getCharacterImages(token);
         setCyborgImgSrc(cyborgImgSrc);
         setCyborgDeadImgSrc(cyborgDeadImgSrc);
-      } catch (error) {
+      } catch (error) { // catch errors
         console.error('Error fetching character images:', error);
       }
     }
     fetchCharacter();
   }, [token]);
 
+  // Make sure Player images are loaded
   useEffect(() => {
-    if (cyborgImgSrc && cyborgDeadImgSrc) {
-      const img = new Image();
-      const deadImg = new Image();
-      let loadedImages = 0;
+    if (cyborgImgSrc && cyborgDeadImgSrc) { // once we have images
+      const img = new Image(); // set up img variable
+      const deadImg = new Image(); // set up deadImg variable
+      let loadedImages = 0; // loaded images variable
 
-      const checkAllLoaded = () => {
+      const checkAllLoaded = () => { // function that checks if both images have loaded
         loadedImages++;
         if (loadedImages === 2) setImagesLoaded(true);
       };
 
-      img.onload = checkAllLoaded;
-      deadImg.onload = checkAllLoaded;
+      img.onload = checkAllLoaded; // load img
+      deadImg.onload = checkAllLoaded; // load deadImg
 
-      img.src = cyborgImgSrc;
-      deadImg.src = cyborgDeadImgSrc;
+      img.src = cyborgImgSrc; // set img to be main player image
+      deadImg.src = cyborgDeadImgSrc; // set deadImg to be dead player image
 
       setCyborgImg(img);
       setCyborgDeadImg(deadImg);
     }
   }, [cyborgImgSrc, cyborgDeadImgSrc]);
 
+  // Set up board for the game
   useEffect(() => {
-    if (imagesLoaded) {
-      const board = document.getElementById('board');
-      board.height = 250;
-      board.width = 750;
-      board.style.background = `url(${backgroundImgSrc}) no-repeat center center fixed`;
+    if (imagesLoaded) { // once images have loaded continue
+      const board = document.getElementById('board'); // set up board element
+      board.height = 250; // set its height
+      board.width = 750; // set its width
+      board.style.background = `url(${backgroundImgSrc}) no-repeat center center fixed`; // set background
       board.style.backgroundSize = 'cover';
 
       const context = board.getContext('2d');

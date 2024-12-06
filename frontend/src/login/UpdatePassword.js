@@ -7,7 +7,7 @@ function UpdatePassword() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Set up navigation
     const token = localStorage.getItem('token');  // Retrieve the token from local storage
 
     // Password validation function
@@ -16,26 +16,30 @@ function UpdatePassword() {
         return strongPasswordRegex.test(password);
     };
 
-    // Handle password update
+    // Handle password updates
     const handleUpdatePassword = async (e) => {
         e.preventDefault();
-    
+
+        // Make sure all fields are inputted
         if (!oldPassword || !newPassword || !confirmPassword) {
             setError('All fields are required');
             return;
         }
     
+        // Make sure that the new password matches in both its fields
         if (newPassword !== confirmPassword) {
             setError('New password and confirm password must match');
             return;
         }
     
+        // Make sure new password meets regex requirements
         if (!validatePassword(newPassword)) {
             setError('New password does not meet the requirements (min 8 characters, 1 symbol, 1 uppercase, 1 lowercase)');
             return;
         }
-    
-        try {
+
+        // Try to update the password
+        try { // Fetch the backend
             const response = await fetch('http://localhost:5000/update-password', {
                 method: 'POST',
                 headers: {
@@ -47,9 +51,11 @@ function UpdatePassword() {
                     newPassword,
                 }),
             });
-    
+
+            // Await backend response
             const result = await response.json();
     
+            // If response is okay send user on their way and clear input fields
             if (response.ok) {
                 setSuccess('Password updated successfully!');
                 setOldPassword('');
@@ -58,10 +64,10 @@ function UpdatePassword() {
                 setTimeout(() => {
                     navigate('/game');  // Redirect after successful update
                 }, 2000);
-            } else {
+            } else { // check for errors on backend side
                 setError(result.message || 'An error occurred while updating the password');
             }
-        } catch (err) {
+        } catch (err) { // check for unexpected errors
             setError('An error occurred while updating the password');
         }
     };

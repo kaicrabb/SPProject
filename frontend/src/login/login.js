@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCharacterImages } from '../game/fetch_character';
+import { getCharacterImages } from '../game/fetch_character'; // grab the character sprites to preload them for the game
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -8,8 +8,9 @@ function Login() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Set up navigation
 
+    // Set up design elements
     useEffect(() => {
         const link = document.createElement('link');
         link.href = 'https://fonts.googleapis.com/css2?family=Silkscreen&display=swap';
@@ -31,9 +32,11 @@ function Login() {
         };
     }, []);
 
+    // Set up handling the login
     const handleLogin = async (e) => {
         e.preventDefault();
     
+        // Check that both username and password are inputted
         if (!username || !password) {
             setError('Username and password are required');
             return;
@@ -43,14 +46,14 @@ function Login() {
         const usernameRegex = /^[a-zA-Z0-9_]+$/;
     
         // Password validation: at least 8 characters, one symbol, one uppercase, one lowercase
-        //const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    
-        if (!usernameRegex.test(username)) {
+        // Handled on server side
+
+        if (!usernameRegex.test(username)) { // Check that username matches the regex case
             setError('Username can only contain letters, numbers, and underscores.');
             return;
         }
         
-    
+        // Try to log the user in
         try {
             const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
@@ -59,39 +62,41 @@ function Login() {
                 },
                 body: JSON.stringify({ Username: username, Password: password }),
             });
-    
+
+            // Await the backend response
             const result = await response.json();
     
+            // If response is good log the user in
             if (response.ok) {
                 const token = result.token;
-                localStorage.setItem('token', token);
-                localStorage.setItem('username', result.Username);
+                localStorage.setItem('token', token); // store the users token
+                localStorage.setItem('username', result.Username); // store the users username in local storage
     
                 // Preload character images
                 try {
-                    await getCharacterImages(token);
+                    await getCharacterImages(token); 
                     console.log('Character images preloaded successfully!');
                 } catch (err) {
                     console.error('Error preloading character images:', err);
                 }
     
-                // Check if the account uses legacy passwords
+                // Check if the account uses legacy passwords ( if the account was made before regex was added)
                 if (result.passwordStrength === 'legacy') {
                     alert(
                         'Your account is using an old password. Please update your password for enhanced security.'
                     );
                     navigate('/update-password'); // Redirect to password update page
-                } else {
+                } else { // Log the user 
                     setSuccess('Login successful!');
-                    alert('Login Successful!');
-                    setUsername('');
-                    setPassword('');
-                    navigate('/game');
+                    alert('Login Successful!'); // tell the user that login was successful
+                    setUsername(''); // get rid of input in fields
+                    setPassword(''); // get rid of input in fields
+                    navigate('/game'); // log the user in
                 }
-            } else {
+            } else { // Error out without telling them why that username or password didn't work
                 setError(result.message || 'Invalid username or password');
             }
-        } catch (err) {
+        } catch (err) { // Catch unexpected errors
             setError('An error occurred while logging in.');
         }
     };    

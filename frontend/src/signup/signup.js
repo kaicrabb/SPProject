@@ -6,9 +6,9 @@ function SignUp() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');  // For handling errors
   const [success, setSuccess] = useState('');  // For showing success messages
+  const navigate = useNavigate(); // For navigating to other pages
 
-  const navigate = useNavigate();
-
+  // Set up the design elements
   useEffect(() => {
     // Step 1: Dynamically inject the Google Font into the document
     const link = document.createElement('link');
@@ -33,9 +33,11 @@ function SignUp() {
     };
   }, []); // Empty dependency array to run only once
 
+  // Set up Signing up for an account
   const handleSignup = async (e) => {
     e.preventDefault();
 
+    // Check that neither the password nor the username fields are empty
     if (!username || !password) {
       setError('Username and password are required');
       return;
@@ -46,18 +48,19 @@ function SignUp() {
     // Password validation: at least 8 characters, one symbol, one uppercase, one lowercase
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    if (!usernameRegex.test(username)) {
+    if (!usernameRegex.test(username)) { // Check that the username matches our regex
       setError('Username can only contain letters, numbers, and underscores.');
       return;
     }
 
-    if (!passwordRegex.test(password)) {
+    if (!passwordRegex.test(password)) { // Check that the password matches our regex
       setError(
         'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.'
       );
       return;
     }
 
+    // Try to send the data out to the data base
     try {
       // Send POST request to backend API (Express)
       const response = await fetch('http://localhost:5000/contact', {
@@ -68,14 +71,17 @@ function SignUp() {
         body: JSON.stringify({ Username: username, Password: password }),
       });
 
+      // Wait for a response
       const result = await response.json();
 
+      // If response is good notify the user they were signed in
       if (response.ok) {
         setSuccess('User signed up successfully!');
         alert('Account Created!');
         setUsername('');
         setPassword('');
         
+        // Automatically log the user in once they have signed up
         const loginResponse = await fetch('http://localhost:5000/login', {
           method: 'POST',
           headers: {
@@ -90,13 +96,13 @@ function SignUp() {
           localStorage.setItem('token', loginResult.token);
           localStorage.setItem('username', result.Username);
           navigate('/CharacterSelect'); // Navigate to Character Select
-        } else {
+        } else { //Check if login failed
           setError(loginResult.message || 'Login failed after sign-up');
         }
-      } else {
+      } else { // Check for errors when response being made
         setError(result.message || 'Something went wrong');
       }
-    } catch (err) {
+    } catch (err) { // check for errors that occured when sending data to database
       setError('An error occurred while signing up.');
     }
   };

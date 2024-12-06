@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function CharacterSelect({ setSelectedImage }) {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const token = localStorage.getItem('token');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Set up navigation
 
   // List of character images
   const CharacterImages = [
@@ -16,6 +16,7 @@ function CharacterSelect({ setSelectedImage }) {
     // name image files in all lowercase "name.png" and "name-dead.png" where name is whatever you want it to be
   ];
 
+  // Set up design elements
   useEffect(() => {
     // Dynamically load font
     const link = document.createElement('link');
@@ -36,14 +37,16 @@ function CharacterSelect({ setSelectedImage }) {
 
   // Send character data to the server
   const sendCharacterToServer = async () => {
+    // Check that a character was selected
     if (!selectedCharacter) {
       alert('Please select a character first.');
       return;
     }
-    // make a path to the deadsprite by taking taking name of the chosen sprite
+    // Make a path to the deadsprite by taking taking name of the chosen sprite
     const deadSprite = `/charactericons/${selectedCharacter.name.toLowerCase()}-dead.png`;
 
     try { // try to send the paths back to the database
+      // Fetch backend connection
       const response = await fetch('http://localhost:3000/submit-character', {
         method: 'POST',
         headers: {
@@ -56,19 +59,19 @@ function CharacterSelect({ setSelectedImage }) {
         }),
       });
 
-      if (response.ok) { // make sure the character images were saved
+      if (response.ok) { // Make sure the character images were saved
         const data = await response.json();
         console.log('Character saved successfully:', data.message);
-        navigate('/game'); // bring the player to the game
-      } else {// notify the user that the character wasn't saved
+        navigate('/game'); // Bring the player to the game
+      } else {// Notify the user that the character wasn't saved
         throw new Error('Failed to save character.');
       }
-    } catch (error) {// check for any other error that cuased them not ot be saved
+    } catch (error) {// Check for any other error that cuased them not ot be saved
       console.error('Error saving character:', error);
     }
   };
 
-  return (// set up some html for the page
+  return (// Set up some html for the page
     <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center' }}>
       <h1>Select Your Character</h1>
       <p style={{fontSize: '14px', color: 'white' }}>Note: all hitboxes are the same regardless of sprite size</p>

@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
-import SignUp from './signup/signup';
-import Login from './login/login';
+import SignUp from './signup/signup'; // Import Signup function from signup
+import Login from './login/login'; // Import Login function from login
 import UpdatePassword from './login/UpdatePassword';
 import './App.css'; // Import the CSS file for styling
-import DelAcc from './delete_account/delacc';
-import Profile from './profile/profile';
-import Game from './game/game';
-import CharacterSelect from './character_select/character_select';
-import Leaderboard from './leaderboard/leaderboard';
+import DelAcc from './delete_account/delacc'; // Import DelAcc function from delacc
+import Profile from './profile/profile'; // Import Profile function from profile
+import Game from './game/game'; // Import Game function from game
+import CharacterSelect from './character_select/character_select'; // Import CharacterSelect function from character_select
+import Leaderboard from './leaderboard/leaderboard'; // Import Leaderboard function from leaderboard
 
 function App() {
-  // State is still here if we decide to add functionality later
+  // Set up constants to use in the app
   const [fontFamily, setFontFamily] = useState('');
   const [selectedImage, setSelectedImage] = useState(localStorage.getItem('profileImage') || '/profileicons/profiledefault.png');
   const [characterImage, setCharacterImage] = useState(null);
 
-  // Check if the user is logged in
+  // Check if the user is logged in, used to block out the user from certain pages if not logged in
   const isAuthenticated = () => {
     return localStorage.getItem('token') !== null;  
   }
 
-  useEffect(() => {
+  useEffect(() => { // Display our title
     document.title = 'Little Guy';
   }, []); // Empty dependency array ensures this effect runs once on mount
 
@@ -31,7 +31,7 @@ function App() {
         {/* Image at the top with fade-in effect */}
         <img src="https://i.ibb.co/Tt6zjVC/ascii-text-art-donefs.png" alt="Title" className="header-image" />
 
-        {/* Header Section */}
+        {/* Buttons to go to certain pages */}
         <header>
           <nav>
             <Link to="/signup">
@@ -43,7 +43,8 @@ function App() {
             <Link to="/leaderboard">
               <button>Leaderboards</button>
             </Link>
-            <Link to="/profile">
+            <Link to="/profile"> 
+              {/* Set profile button to be your profile icon */}
               <img src={selectedImage} alt="Profile" style={{ width: '50px', height: '50px', cursor: 'pointer' }} />
             </Link>
           </nav>
