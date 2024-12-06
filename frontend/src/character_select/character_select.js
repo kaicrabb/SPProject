@@ -66,13 +66,13 @@ function CharacterSelect({ setSelectedImage }) {
       } else {// Notify the user that the character wasn't saved
         throw new Error('Failed to save character.');
       }
-    } catch (error) {// Check for any other error that cuased them not ot be saved
+    } catch (error) {// Check for any other error that caused them not ot be saved
       console.error('Error saving character:', error);
     }
   };
 
   return (// Set up some html for the page
-    <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center' }}>
+    <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center', color:'white' }}>
       <h1>Select Your Character</h1>
       <p style={{fontSize: '14px', color: 'white' }}>Note: all hitboxes are the same regardless of sprite size</p>
       {selectedCharacter && (

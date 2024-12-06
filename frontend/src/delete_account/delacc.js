@@ -82,7 +82,7 @@ function DelAcc() {
   }, []); // Empty dependency array to run only once
 
   return (
-    <div>
+    <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center', color:'white' }}>
       <h2>Delete Account</h2>
       <form onSubmit={handleDeleteAccount}>
         <input

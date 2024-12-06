@@ -12,7 +12,7 @@ import Leaderboard from './leaderboard/leaderboard'; // Import Leaderboard funct
 
 function App() {
   // Set up constants to use in the app
-  const [fontFamily, setFontFamily] = useState('');
+  const [fontFamily] = useState('');
   const [selectedImage, setSelectedImage] = useState(localStorage.getItem('profileImage') || '/profileicons/profiledefault.png');
   const [characterImage, setCharacterImage] = useState(null);
 

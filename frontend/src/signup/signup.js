@@ -108,7 +108,7 @@ function SignUp() {
   };
 
   return (
-    <div>
+    <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center', color:'white' }}>
       <h2>Sign Up Here!</h2>
       <form onSubmit={handleSignup}>
         <input

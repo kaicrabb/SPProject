@@ -102,7 +102,7 @@ function Login() {
     };    
 
     return (
-        <div>
+        <div style={{ fontFamily: 'Silkscreen, sans-serif', textAlign: 'center', color:'white' }}>
             <h2>Login Here!</h2>
             <form onSubmit={handleLogin}>
                 <input
