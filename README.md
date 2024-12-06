@@ -11,8 +11,9 @@ A project that involves a website with a simple game where users can create acco
 * npm install cors
 * npm install jsonwebtoken
 * npm install dayjs
-* npm install body-parser 
-* or just do ```cd backend | npm install mongoose bcryptjs cors jsonwebtoken dayjs body-parser ```
+* npm install body-parser
+* npm install express
+* or just do ```cd backend | npm install mongoose bcryptjs cors jsonwebtoken dayjs body-parser express```
 #### <b>START BACKEND:</b>
 1. cd backend
 2. npm run dev
